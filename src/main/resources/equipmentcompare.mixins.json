@@ -1,0 +1,14 @@
+{
+	"required": true,
+	"package": "com.anthonyhilyard.equipmentcompare.mixin",
+	"compatibilityLevel": "JAVA_8",
+	"refmap": "equipmentcompare.refmap.json",
+	"mixins": [
+		"ContainerScreenMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"minVersion": "0.8",
+	"target": "@env(DEFAULT)"
+}

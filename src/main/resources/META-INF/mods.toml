@@ -1,0 +1,26 @@
+modLoader="javafml"
+loaderVersion="[36,)"
+license="MIT"
+
+[[mods]]
+modId="equipmentcompare"
+version="${version}"
+displayName="Equipment Compare"
+displayURL="https://anthonyhilyard.com/"
+logoFile="icon.png"
+authors="Grend"
+description='''Adds additional tooltips when hovering over equipment for easy comparisons.'''
+
+[[dependencies.equipmentcompare]]
+	modId="forge"
+	mandatory=true
+	versionRange="[36,)"
+	ordering="NONE"
+	side="BOTH"
+
+[[dependencies.equipmentcompare]]
+	modId="minecraft"
+	mandatory=true
+	versionRange="[1.16.5]"
+	ordering="NONE"
+	side="BOTH"
