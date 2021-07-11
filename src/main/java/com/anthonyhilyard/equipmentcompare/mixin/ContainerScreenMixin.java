@@ -174,12 +174,6 @@ public class ContainerScreenMixin extends Screen
 		{
 			// If this is a piece of equipment and we are already wearing the same type, display an additional tooltip as well.
 			EquipmentSlotType slot = MobEntity.getSlotForItemStack(itemStack);
-			
-			// Don't compare mainhand items because that's silly.
-			if (slot == EquipmentSlotType.MAINHAND)
-			{
-				return;
-			}
 
 			ItemStack equippedItem = this.minecraft.player.getItemStackFromSlot(slot);
 			if (equippedItem != ItemStack.EMPTY && equippedItem != itemStack && (EquipmentCompare.tooltipActive ^ EquipmentCompareConfig.INSTANCE.defaultOn.get()))
