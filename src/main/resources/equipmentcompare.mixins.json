@@ -3,8 +3,10 @@
 	"package": "com.anthonyhilyard.equipmentcompare.mixin",
 	"compatibilityLevel": "JAVA_8",
 	"refmap": "equipmentcompare.refmap.json",
+	"plugin": "com.anthonyhilyard.equipmentcompare.mixin.CuriosMixinConfig",
 	"mixins": [
-		"ContainerScreenMixin"
+		"ContainerScreenMixin",
+		"CuriosScreenMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

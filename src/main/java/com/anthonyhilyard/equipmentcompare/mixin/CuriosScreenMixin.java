@@ -1,7 +1,5 @@
 package com.anthonyhilyard.equipmentcompare.mixin;
 
-import javax.annotation.Nullable;
-
 import com.anthonyhilyard.equipmentcompare.gui.ComparisonTooltips;
 import com.mojang.blaze3d.matrix.MatrixStack;
 
@@ -11,19 +9,20 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.inventory.container.Slot;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.text.ITextComponent;
+import top.theillusivec4.curios.client.gui.CuriosScreen;
+import top.theillusivec4.curios.common.inventory.container.CuriosContainer;
 
-@Mixin(ContainerScreen.class)
-public class ContainerScreenMixin extends Screen
+@Mixin(CuriosScreen.class)
+public class CuriosScreenMixin extends ContainerScreen<CuriosContainer>
 {
-	protected ContainerScreenMixin(ITextComponent titleIn) { super(titleIn); }
+	public CuriosScreenMixin(CuriosContainer screenContainer, PlayerInventory inv, ITextComponent titleIn) { super(screenContainer, inv, titleIn); }
 
 	@Shadow
-	@Nullable
-	protected Slot hoveredSlot;
+	@Override
+	protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int x, int y) {  }
 
 	@Inject(method = "renderHoveredTooltip(Lcom/mojang/blaze3d/matrix/MatrixStack;II)V", at = @At(value  = "HEAD"), cancellable = true)
 	public void renderHoveredTooltip(MatrixStack matrixStack, int x, int y, CallbackInfo info)

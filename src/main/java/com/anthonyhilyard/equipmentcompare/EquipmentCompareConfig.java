@@ -15,6 +15,7 @@ public class EquipmentCompareConfig
 	public static final EquipmentCompareConfig INSTANCE;
 
 	public final BooleanValue defaultOn;
+	public final BooleanValue strict;
 	public final LongValue badgeBackgroundColor;
 	public final LongValue badgeBorderStartColor;
 	public final LongValue badgeBorderEndColor;
@@ -39,6 +40,7 @@ public class EquipmentCompareConfig
 		build.pop().push("control_options");
 
 		defaultOn = build.comment("If the comparison tooltip should show by default (pressing bound key hides).").define("default_on", false);
+		strict = build.comment("If tool comparisons should compare only the same types of tools (can't compare a sword to an axe, for example).").define("strict", false);
 
 		build.pop().pop();
 	}
