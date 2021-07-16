@@ -1,7 +1,9 @@
 package com.anthonyhilyard.equipmentcompare.gui;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.anthonyhilyard.equipmentcompare.EquipmentCompare;
 import com.anthonyhilyard.equipmentcompare.EquipmentCompareConfig;
@@ -154,6 +156,48 @@ public class ComparisonTooltips
 		return rect;
 	}
 
+	private static void drawTooltip(MatrixStack matrixStack, ItemStack itemStack, Rectangle2d rect, List<ITextComponent> tooltipLines, FontRenderer font, Screen screen, int maxWidth, boolean showBadge)
+	{
+		int bgColor = (int)EquipmentCompareConfig.INSTANCE.badgeBackgroundColor.get().longValue();
+		int borderStartColor = (int)EquipmentCompareConfig.INSTANCE.badgeBorderStartColor.get().longValue();
+		int borderEndColor = (int)EquipmentCompareConfig.INSTANCE.badgeBorderEndColor.get().longValue();
+		StringTextComponent equippedBadge = new StringTextComponent(EquipmentCompareConfig.INSTANCE.badgeText.get());
+
+		GuiUtils.preItemToolTip(itemStack);
+
+		if (showBadge)
+		{
+			if (rect.getY() + rect.getHeight() + 4 > screen.height)
+			{
+				rect = new Rectangle2d(rect.getX(), screen.height - rect.getHeight() - 4, rect.getWidth(), rect.getHeight());
+			}
+
+			matrixStack.push();
+			matrixStack.translate(0, 0, 401);
+			IRenderTypeBuffer.Impl renderType = IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer());
+
+			Matrix4f matrix = matrixStack.getLast().getMatrix();
+
+			// Draw the "equipped" badge.
+			GuiUtils.drawGradientRect(matrix, -1, rect.getX() + 1,					 rect.getY() - 15, rect.getX() + rect.getWidth() - 1, rect.getY() - 14, bgColor, bgColor);
+			GuiUtils.drawGradientRect(matrix, -1, rect.getX() + 1,					 rect.getY() - 2,  rect.getX() + rect.getWidth() - 1, rect.getY() - 1,  bgColor, bgColor);
+			GuiUtils.drawGradientRect(matrix, -1, rect.getX() + 1,					 rect.getY() - 14, rect.getX() + rect.getWidth() - 1, rect.getY() - 2,  bgColor, bgColor);
+			GuiUtils.drawGradientRect(matrix, -1, rect.getX(),						 rect.getY() - 14, rect.getX() + 1, 				  rect.getY() - 2,  bgColor, bgColor);
+			GuiUtils.drawGradientRect(matrix, -1, rect.getX() + rect.getWidth() - 1, rect.getY() - 14, rect.getX() + rect.getWidth(),	  rect.getY() - 2,  bgColor, bgColor);
+			GuiUtils.drawGradientRect(matrix, -1, rect.getX() + 1,					 rect.getY() - 13, rect.getX() + 2, 				  rect.getY() - 3,  borderStartColor, borderEndColor);
+			GuiUtils.drawGradientRect(matrix, -1, rect.getX() + rect.getWidth() - 2, rect.getY() - 13, rect.getX() + rect.getWidth() - 1, rect.getY() - 3,  borderStartColor, borderEndColor);
+			GuiUtils.drawGradientRect(matrix, -1, rect.getX() + 1,					 rect.getY() - 14, rect.getX() + rect.getWidth() - 1, rect.getY() - 13, borderStartColor, borderStartColor);
+			GuiUtils.drawGradientRect(matrix, -1, rect.getX() + 1,					 rect.getY() - 3,  rect.getX() + rect.getWidth() - 1, rect.getY() - 2,  borderEndColor, borderEndColor);
+
+			font.func_238416_a_(LanguageMap.getInstance().func_241870_a(equippedBadge), (float)rect.getX() + (rect.getWidth() - font.getStringPropertyWidth(equippedBadge)) / 2, (float)rect.getY() - 12, -1, true, matrixStack.getLast().getMatrix(), renderType, false, 0x000000, 0xF000F0);
+			renderType.finish();
+			matrixStack.pop();
+		}
+
+		GuiUtils.drawHoveringText(matrixStack, tooltipLines, rect.getX() - 8, rect.getY() + 18, screen.width, screen.height, maxWidth, font);
+		GuiUtils.postItemToolTip();
+	}
+
 	@SuppressWarnings("unchecked")
 	public static boolean render(MatrixStack matrixStack, int x, int y, Slot hoveredSlot, Minecraft minecraft, FontRenderer font, Screen screen)
 	{
@@ -162,11 +206,6 @@ public class ComparisonTooltips
 		{
 			return false;
 		}
-
-		int bgColor = (int)EquipmentCompareConfig.INSTANCE.badgeBackgroundColor.get().longValue();
-		int borderStartColor = (int)EquipmentCompareConfig.INSTANCE.badgeBorderStartColor.get().longValue();
-		int borderEndColor = (int)EquipmentCompareConfig.INSTANCE.badgeBorderEndColor.get().longValue();
-		final int maxTooltipWidth = 200;
 
 		ItemStack itemStack = hoveredSlot != null ? hoveredSlot.getStack() : ItemStack.EMPTY;
 		if (minecraft.player.inventory.getItemStack().isEmpty() && !itemStack.isEmpty())
@@ -219,75 +258,75 @@ public class ComparisonTooltips
 
 			if (!equippedItems.isEmpty() && (EquipmentCompare.tooltipActive ^ EquipmentCompareConfig.INSTANCE.defaultOn.get()))
 			{
+				int maxWidth = (screen.width / (equippedItems.size() + 1)) - ((equippedItems.size() + 1) * 16);
+				FontRenderer itemFont = itemStack.getItem().getFontRenderer(itemStack);
+				if (itemFont == null)
+				{
+					itemFont = font;
+				}
+
+				List<ITextComponent> itemStackTooltipLines = screen.getTooltipFromItem(itemStack);
+				Rectangle2d itemStackRect = calculateTooltipRect(itemStack, matrixStack, itemStackTooltipLines, x, y, screen.width, screen.height, maxWidth, itemFont);
+				if (x + itemStackRect.getWidth() + 12 > screen.width)
+				{
+					itemStackRect = new Rectangle2d(screen.width - itemStackRect.getWidth() - 24, itemStackRect.getY(), itemStackRect.getWidth(), itemStackRect.getHeight());
+				}
+				else
+				{
+					itemStackRect = new Rectangle2d(itemStackRect.getX() - 2, itemStackRect.getY(), itemStackRect.getWidth(), itemStackRect.getHeight());
+				}
+
+				Map<ItemStack, Rectangle2d> tooltipRects = new HashMap<ItemStack, Rectangle2d>();
+				Map<ItemStack, List<ITextComponent>> tooltipLines = new HashMap<ItemStack, List<ITextComponent>>();
+
+				Rectangle2d previousRect = itemStackRect;
+
+				// Set up tooltip rects.
 				for (ItemStack thisItem : equippedItems)
 				{
-					FontRenderer itemFont = itemStack.getItem().getFontRenderer(itemStack);
-					if (itemFont == null)
+					if (thisItem.getItem().getFontRenderer(thisItem) != null)
 					{
-						itemFont = font;
+						itemFont = thisItem.getItem().getFontRenderer(thisItem);
 					}
 
-					GuiUtils.preItemToolTip(itemStack);
-					List<ITextComponent> itemStackTooltipLines = screen.getTooltipFromItem(itemStack);
 					List<ITextComponent> equippedTooltipLines = screen.getTooltipFromItem(thisItem);
-
-					Rectangle2d itemStackRect = calculateTooltipRect(itemStack, matrixStack, itemStackTooltipLines, x, y, screen.width, screen.height, maxTooltipWidth, itemFont);
-					Rectangle2d equippedRect = calculateTooltipRect(itemStack, matrixStack, equippedTooltipLines, x - itemStackRect.getWidth() - 14, y, screen.width, screen.height, maxTooltipWidth, itemFont);
-
-					if (x + itemStackRect.getWidth() + 16 > screen.width)
-					{
-						itemStackRect = new Rectangle2d(screen.width - itemStackRect.getWidth() - 4, itemStackRect.getY(), itemStackRect.getWidth(), itemStackRect.getHeight());
-					}
-
+					Rectangle2d equippedRect = calculateTooltipRect(itemStack, matrixStack, equippedTooltipLines, x - previousRect.getWidth() - 14, y, screen.width, screen.height, maxWidth, itemFont);
 					StringTextComponent equippedBadge = new StringTextComponent(EquipmentCompareConfig.INSTANCE.badgeText.get());
 					
 					// Fix equippedRect x coordinate.
 					int tooltipWidth = equippedRect.getWidth();
 					equippedRect = new Rectangle2d(equippedRect.getX(), equippedRect.getY(), Math.max(equippedRect.getWidth(), itemFont.getStringPropertyWidth(equippedBadge) + 8), equippedRect.getHeight());
-					equippedRect = new Rectangle2d(itemStackRect.getX() - equippedRect.getWidth() - 16 - (equippedRect.getWidth() - tooltipWidth) / 2, equippedRect.getY(), equippedRect.getWidth(), equippedRect.getHeight());
+					equippedRect = new Rectangle2d(previousRect.getX() - equippedRect.getWidth() - 16 - (equippedRect.getWidth() - tooltipWidth) / 2, equippedRect.getY(), equippedRect.getWidth(), equippedRect.getHeight());
 
-					// Ensure it's still on the screen on the left side.
-					if (equippedRect.getX() < 0)
+					tooltipRects.put(thisItem, equippedRect);
+					tooltipLines.put(thisItem, equippedTooltipLines);
+					previousRect = equippedRect;
+				}
+
+				// Fix rects to fit onscreen, if possible.
+				// If the last rect (which is the left-most one) is off the screen, move all the rects over.
+				int xOffset = -tooltipRects.get(equippedItems.get(equippedItems.size() - 1)).getX();
+				if (xOffset > 0)
+				{
+					// Move the equipped rects.
+					for (ItemStack thisItem : equippedItems)
 					{
-						equippedRect = new Rectangle2d(0, equippedRect.getY(), equippedRect.getWidth(), equippedRect.getHeight());
-						itemStackRect = new Rectangle2d(equippedRect.getWidth() + 16, itemStackRect.getY(), itemStackRect.getWidth(), itemStackRect.getHeight());
+						Rectangle2d equippedRect = tooltipRects.get(thisItem);
+						tooltipRects.replace(thisItem, new Rectangle2d(equippedRect.getX() + xOffset, equippedRect.getY(), equippedRect.getWidth(), equippedRect.getHeight()));
 					}
 
-					GuiUtils.drawHoveringText(matrixStack, itemStackTooltipLines, itemStackRect.getX() - 10, y, screen.width, screen.height, maxTooltipWidth, itemFont);
-					GuiUtils.postItemToolTip();
-
-					GuiUtils.preItemToolTip(thisItem);
-
-					matrixStack.push();
-					matrixStack.translate(0, 0, 401);
-					IRenderTypeBuffer.Impl renderType = IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer());
-
-					Matrix4f matrix = matrixStack.getLast().getMatrix();
-
-					// Draw the "equipped" badge.
-					GuiUtils.drawGradientRect(matrix, -1, equippedRect.getX() + 1,							 equippedRect.getY() - 15, equippedRect.getX() + equippedRect.getWidth() - 1, equippedRect.getY() - 14, bgColor, bgColor);
-					GuiUtils.drawGradientRect(matrix, -1, equippedRect.getX() + 1,							 equippedRect.getY() - 2,  equippedRect.getX() + equippedRect.getWidth() - 1, equippedRect.getY() - 1,  bgColor, bgColor);
-					GuiUtils.drawGradientRect(matrix, -1, equippedRect.getX() + 1,							 equippedRect.getY() - 14, equippedRect.getX() + equippedRect.getWidth() - 1, equippedRect.getY() - 2,  bgColor, bgColor);
-					GuiUtils.drawGradientRect(matrix, -1, equippedRect.getX(),								 equippedRect.getY() - 14, equippedRect.getX() + 1, 						  equippedRect.getY() - 2,  bgColor, bgColor);
-					GuiUtils.drawGradientRect(matrix, -1, equippedRect.getX() + equippedRect.getWidth() - 1, equippedRect.getY() - 14, equippedRect.getX() + equippedRect.getWidth(),	  equippedRect.getY() - 2,  bgColor, bgColor);
-					GuiUtils.drawGradientRect(matrix, -1, equippedRect.getX() + 1,							 equippedRect.getY() - 13, equippedRect.getX() + 2, 						  equippedRect.getY() - 3,  borderStartColor, borderEndColor);
-					GuiUtils.drawGradientRect(matrix, -1, equippedRect.getX() + equippedRect.getWidth() - 2, equippedRect.getY() - 13, equippedRect.getX() + equippedRect.getWidth() - 1, equippedRect.getY() - 3,  borderStartColor, borderEndColor);
-					GuiUtils.drawGradientRect(matrix, -1, equippedRect.getX() + 1,							 equippedRect.getY() - 14, equippedRect.getX() + equippedRect.getWidth() - 1, equippedRect.getY() - 13, borderStartColor, borderStartColor);
-					GuiUtils.drawGradientRect(matrix, -1, equippedRect.getX() + 1,							 equippedRect.getY() - 3,  equippedRect.getX() + equippedRect.getWidth() - 1, equippedRect.getY() - 2,  borderEndColor, borderEndColor);
-
-					itemFont.func_238416_a_(LanguageMap.getInstance().func_241870_a(equippedBadge), (float)equippedRect.getX() + (equippedRect.getWidth() - itemFont.getStringPropertyWidth(equippedBadge)) / 2, (float)equippedRect.getY() - 12, -1, true, matrixStack.getLast().getMatrix(), renderType, false, 0x000000, 0xF000F0);
-					renderType.finish();
-					matrixStack.pop();
-
-					GuiUtils.drawHoveringText(matrixStack, equippedTooltipLines, equippedRect.getX() - 8, y, screen.width, screen.height, maxTooltipWidth, itemFont);
-					GuiUtils.postItemToolTip();
-
-					// info.cancel();
-					// return;
-
-					// TODO: don't return here, in case there are more tooltips to draw.
-					return true;
+					// Move the hovered item rect.
+					itemStackRect = new Rectangle2d(itemStackRect.getX() + xOffset, itemStackRect.getY(), itemStackRect.getWidth(), itemStackRect.getHeight());
 				}
+
+				// Now draw them all.
+				for (ItemStack thisItem : equippedItems)
+				{
+					drawTooltip(matrixStack, thisItem, tooltipRects.get(thisItem), tooltipLines.get(thisItem), font, screen, maxWidth, true);
+				}
+				drawTooltip(matrixStack, itemStack, itemStackRect, itemStackTooltipLines, font, screen, maxWidth, false);
+
+				return true;
 			}
 			// Otherwise display the tooltip normally.
 			else
