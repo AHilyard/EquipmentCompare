@@ -15,12 +15,14 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.Rectangle2d;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ToolItem;
+import net.minecraft.item.TieredItem;
 import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.ITextProperties;
@@ -222,7 +224,7 @@ public class ComparisonTooltips
 			if (slot == EquipmentSlotType.MAINHAND)
 			{
 				// If they aren't both tools, don't compare them.
-				if (!(itemStack.getItem() instanceof ToolItem) || !(equippedItem.getItem() instanceof ToolItem))
+				if (!(itemStack.getItem() instanceof TieredItem) || !(equippedItem.getItem() instanceof TieredItem))
 				{
 					checkItem = false;
 				}
