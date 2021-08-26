@@ -26,7 +26,7 @@ public class EquipmentCompare
 	@SubscribeEvent
 	public static void onKeyInputEvent(KeyInputEvent event)
 	{
-		tooltipActive = showComparisonTooltip.isPressed();
+		tooltipActive = showComparisonTooltip.consumeClick();
 	}
 
 }
