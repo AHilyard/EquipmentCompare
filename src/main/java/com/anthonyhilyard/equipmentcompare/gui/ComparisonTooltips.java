@@ -70,8 +70,7 @@ public class ComparisonTooltips
 			matrixStack.popPose();
 		}
 
-		GuiUtils.drawHoveringText(matrixStack, tooltipLines, rect.getX() - 8, rect.getY() + 18, screen.width, screen.height, maxWidth, font);
-		GuiUtils.postItemToolTip();
+		Tooltips.renderItemTooltip(itemStack, matrixStack, new Tooltips.TooltipInfo(tooltipLines, font), rect, screen.width, screen.height, GuiUtils.DEFAULT_BACKGROUND_COLOR, GuiUtils.DEFAULT_BORDER_COLOR_START, GuiUtils.DEFAULT_BORDER_COLOR_END);
 	}
 
 	public static boolean render(MatrixStack matrixStack, int x, int y, Slot hoveredSlot, Minecraft minecraft, FontRenderer font, Screen screen)
@@ -153,9 +152,12 @@ public class ComparisonTooltips
 			// Filter blacklisted items.
 			equippedItems.removeIf(stack -> EquipmentCompareConfig.INSTANCE.blacklist.get().contains(stack.getItem().getRegistryName().toString()));
 
+			// Make sure we don't compare an item to itself (can happen with Curios slots).
+			equippedItems.remove(itemStack);
+
 			if (!equippedItems.isEmpty() && (EquipmentCompare.tooltipActive ^ EquipmentCompareConfig.INSTANCE.defaultOn.get()))
 			{
-				int maxWidth = (screen.width / (equippedItems.size() + 1)) - ((equippedItems.size() + 1) * 16);
+				int maxWidth = ((screen.width - (equippedItems.size() * 16)) / (equippedItems.size() + 1));
 				FontRenderer itemFont = itemStack.getItem().getFontRenderer(itemStack);
 				if (itemFont == null)
 				{
@@ -177,6 +179,7 @@ public class ComparisonTooltips
 				Map<ItemStack, List<ITextComponent>> tooltipLines = new HashMap<ItemStack, List<ITextComponent>>();
 
 				Rectangle2d previousRect = itemStackRect;
+				boolean firstRect = true;
 
 				// Set up tooltip rects.
 				for (ItemStack thisItem : equippedItems)
@@ -193,7 +196,15 @@ public class ComparisonTooltips
 					// Fix equippedRect x coordinate.
 					int tooltipWidth = equippedRect.getWidth();
 					equippedRect = new Rectangle2d(equippedRect.getX(), equippedRect.getY(), Math.max(equippedRect.getWidth(), itemFont.width(equippedBadge) + 8), equippedRect.getHeight());
-					equippedRect = new Rectangle2d(previousRect.getX() - equippedRect.getWidth() - 16 - (equippedRect.getWidth() - tooltipWidth) / 2, equippedRect.getY(), equippedRect.getWidth(), equippedRect.getHeight());
+					if (firstRect)
+					{
+						equippedRect = new Rectangle2d(previousRect.getX() - equippedRect.getWidth() - 16 - (equippedRect.getWidth() - tooltipWidth) / 2, equippedRect.getY(), equippedRect.getWidth(), equippedRect.getHeight());
+						firstRect = false;
+					}
+					else
+					{
+						equippedRect = new Rectangle2d(previousRect.getX() - equippedRect.getWidth() - 4 - (equippedRect.getWidth() - tooltipWidth) / 2, equippedRect.getY(), equippedRect.getWidth(), equippedRect.getHeight());
+					}
 
 					tooltipRects.put(thisItem, equippedRect);
 					tooltipLines.put(thisItem, equippedTooltipLines);
