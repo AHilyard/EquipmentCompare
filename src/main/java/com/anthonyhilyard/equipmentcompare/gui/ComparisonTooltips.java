@@ -89,7 +89,7 @@ public class ComparisonTooltips
 			return false;
 		}
 
-		if (minecraft.player.inventory.getCarried().isEmpty() && !itemStack.isEmpty())
+		if (minecraft.player.inventory.getCarried().isEmpty() && !itemStack.isEmpty() && !EquipmentCompareConfig.INSTANCE.blacklist.get().contains(itemStack.getItem().getRegistryName().toString()))
 		{
 			// If this is a piece of equipment and we are already wearing the same type, display an additional tooltip as well.
 			EquipmentSlotType slot = MobEntity.getEquipmentSlotForItem(itemStack);
@@ -149,6 +149,9 @@ public class ComparisonTooltips
 					EquipmentCompare.LOGGER.error(e);
 				}
 			}
+
+			// Filter blacklisted items.
+			equippedItems.removeIf(stack -> EquipmentCompareConfig.INSTANCE.blacklist.get().contains(stack.getItem().getRegistryName().toString()));
 
 			if (!equippedItems.isEmpty() && (EquipmentCompare.tooltipActive ^ EquipmentCompareConfig.INSTANCE.defaultOn.get()))
 			{
