@@ -32,5 +32,4 @@ public class Loader
 			LOGGER.error("Running on a dedicated server, disabling mod.");
 		}
 	}
-
 }

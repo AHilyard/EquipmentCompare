@@ -99,9 +99,10 @@ dependencies {
 	// Fernflower decompiler
 	compile 'org.jetbrains.java.decompiler:fernflower:sponge-SNAPSHOT'
 
-	compile 'curse.maven:iceberg-520110:3458859'
+	compile 'curse.maven:iceberg-520110:3476658'
 	compileClasspath fg.deobf('curse.maven:curios-309927:3343065')
 	compileClasspath fg.deobf('curse.maven:baubles-366844:3179641')
+	compileClasspath 'curse.maven:legendarytooltips-532127:3481460'
 }
 
 jar {

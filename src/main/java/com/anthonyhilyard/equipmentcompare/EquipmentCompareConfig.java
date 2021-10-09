@@ -27,6 +27,7 @@ public class EquipmentCompareConfig
 	public final LongValue badgeBorderStartColor;
 	public final LongValue badgeBorderEndColor;
 	public final ConfigValue<String> badgeText;
+	public final LongValue badgeTextColor;
 	public final ConfigValue<List<? extends String>> blacklist;
 
 	static
@@ -42,6 +43,7 @@ public class EquipmentCompareConfig
 		build.comment("Client Configuration").push("client").push("visual_options");
 
 		badgeText = build.comment(" The text shown on the badge above equipped tooltips.").define("badge_text", "Equipped");
+		badgeTextColor = build.comment(" The color of the text shown on the badge above equipped tooltips.").defineInRange("badge_text_color", 0xFFFFFFFFL, 0x00000000L, 0xFFFFFFFFL);
 		badgeBackgroundColor = build.comment(" The background color of the \"equipped\" badge.").defineInRange("badge_bg", 0xF0101000L, 0x00000000L, 0xFFFFFFFFL);
 		badgeBorderStartColor = build.comment(" The start border color of the \"equipped\" badge.").defineInRange("badge_border_start", 0xD0AA9113L, 0x00000000L, 0xFFFFFFFFL);
 		badgeBorderEndColor = build.comment(" The end border color of the \"equipped\" badge.").defineInRange("badge_border_end", 0x60C2850AL, 0x00000000L, 0xFFFFFFFFL);
