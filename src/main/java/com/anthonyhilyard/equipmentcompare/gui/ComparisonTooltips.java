@@ -8,41 +8,44 @@ import java.util.Map;
 import com.anthonyhilyard.equipmentcompare.EquipmentCompare;
 import com.anthonyhilyard.equipmentcompare.EquipmentCompareConfig;
 import com.anthonyhilyard.iceberg.util.Tooltips;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.Rectangle2d;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.TieredItem;
-import net.minecraft.util.math.vector.Matrix4f;
-import net.minecraft.util.text.Color;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.ITextProperties;
-import net.minecraft.util.text.LanguageMap;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.Style;
-import net.minecraftforge.fml.client.gui.GuiUtils;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
+import net.minecraft.client.renderer.Rect2i;
+import com.mojang.blaze3d.vertex.Tesselator;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TieredItem;
+import com.mojang.math.Matrix4f;
+import net.minecraft.network.chat.TextColor;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.locale.Language;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraftforge.fmlclient.gui.GuiUtils;
+import net.minecraftforge.client.RenderProperties;
 import net.minecraftforge.fml.ModList;
 
 public class ComparisonTooltips
 {
-	private static void drawTooltip(MatrixStack matrixStack, ItemStack itemStack, Rectangle2d rect, List<ITextComponent> tooltipLines, FontRenderer font, Screen screen, int maxWidth, boolean showBadge)
+	@SuppressWarnings("removal")
+	private static void drawTooltip(PoseStack poseStack, ItemStack itemStack, Rect2i rect, List<Component> tooltipLines, Font font, Screen screen, int maxWidth, boolean showBadge)
 	{
 		int bgColor = (int)EquipmentCompareConfig.INSTANCE.badgeBackgroundColor.get().longValue();
 		int borderStartColor = (int)EquipmentCompareConfig.INSTANCE.badgeBorderStartColor.get().longValue();
 		int borderEndColor = (int)EquipmentCompareConfig.INSTANCE.badgeBorderEndColor.get().longValue();
 		
-		Style textColor = Style.EMPTY.withColor(Color.fromRgb((int)EquipmentCompareConfig.INSTANCE.badgeTextColor.get().longValue()));
-		ITextProperties equippedBadge = new StringTextComponent(EquipmentCompareConfig.INSTANCE.badgeText.get()).withStyle(textColor);
+		Style textColor = Style.EMPTY.withColor(TextColor.fromRgb((int)EquipmentCompareConfig.INSTANCE.badgeTextColor.get().longValue()));
+		MutableComponent equippedBadge = new TextComponent(EquipmentCompareConfig.INSTANCE.badgeText.get()).withStyle(textColor);
 
 		GuiUtils.preItemToolTip(itemStack);
 
@@ -50,14 +53,14 @@ public class ComparisonTooltips
 		{
 			if (rect.getY() + rect.getHeight() + 4 > screen.height)
 			{
-				rect = new Rectangle2d(rect.getX(), screen.height - rect.getHeight() - 4, rect.getWidth(), rect.getHeight());
+				rect = new Rect2i(rect.getX(), screen.height - rect.getHeight() - 4, rect.getWidth(), rect.getHeight());
 			}
 
-			matrixStack.pushPose();
-			matrixStack.translate(0, 0, 401);
-			IRenderTypeBuffer.Impl renderType = IRenderTypeBuffer.immediate(Tessellator.getInstance().getBuilder());
+			poseStack.pushPose();
+			poseStack.translate(0, 0, 401);
+			BufferSource renderType = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
 
-			Matrix4f matrix = matrixStack.last().pose();
+			Matrix4f matrix = poseStack.last().pose();
 
 			int badgeOffset = 0;
 
@@ -93,22 +96,22 @@ public class ComparisonTooltips
 				GuiUtils.drawGradientRect(matrix, -1, rect.getX() + 1,					 rect.getY() - 3 + badgeOffset,  rect.getX() + rect.getWidth() - 1, rect.getY() - 2 + badgeOffset,  borderEndColor,   borderEndColor);
 			}
 
-			font.drawInBatch(LanguageMap.getInstance().getVisualOrder(equippedBadge), (float)rect.getX() + (rect.getWidth() - font.width(equippedBadge)) / 2, (float)rect.getY() - 12 + badgeOffset, -1, true, matrixStack.last().pose(), renderType, false, 0x000000, 0xF000F0);
+			font.drawInBatch(Language.getInstance().getVisualOrder(equippedBadge), (float)rect.getX() + (rect.getWidth() - font.width(equippedBadge)) / 2, (float)rect.getY() - 12 + badgeOffset, -1, true, poseStack.last().pose(), renderType, false, 0x000000, 0xF000F0);
 			renderType.endBatch();
-			matrixStack.popPose();
+			poseStack.popPose();
 		}
 
-		Tooltips.renderItemTooltip(itemStack, matrixStack, new Tooltips.TooltipInfo(tooltipLines, font), rect, screen.width, screen.height, GuiUtils.DEFAULT_BACKGROUND_COLOR, GuiUtils.DEFAULT_BORDER_COLOR_START, GuiUtils.DEFAULT_BORDER_COLOR_END, showBadge);
+		Tooltips.renderItemTooltip(itemStack, poseStack, new Tooltips.TooltipInfo(tooltipLines, font), rect, screen.width, screen.height, GuiUtils.DEFAULT_BACKGROUND_COLOR, GuiUtils.DEFAULT_BORDER_COLOR_START, GuiUtils.DEFAULT_BORDER_COLOR_END, showBadge);
 	}
 
-	public static boolean render(MatrixStack matrixStack, int x, int y, Slot hoveredSlot, Minecraft minecraft, FontRenderer font, Screen screen)
+	public static boolean render(PoseStack poseStack, int x, int y, Slot hoveredSlot, Minecraft minecraft, Font font, Screen screen)
 	{
 		ItemStack itemStack = hoveredSlot != null ? hoveredSlot.getItem() : ItemStack.EMPTY;
-		return render(matrixStack, x, y, itemStack, minecraft, font, screen);
+		return render(poseStack, x, y, itemStack, minecraft, font, screen);
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static boolean render(MatrixStack matrixStack, int x, int y, ItemStack itemStack, Minecraft minecraft, FontRenderer font, Screen screen)
+	public static boolean render(PoseStack poseStack, int x, int y, ItemStack itemStack, Minecraft minecraft, Font font, Screen screen)
 	{
 		// The screen must be valid to render tooltips.
 		if (screen == null)
@@ -116,10 +119,10 @@ public class ComparisonTooltips
 			return false;
 		}
 
-		if (minecraft.player.inventory.getCarried().isEmpty() && !itemStack.isEmpty() && !EquipmentCompareConfig.INSTANCE.blacklist.get().contains(itemStack.getItem().getRegistryName().toString()))
+		if (!itemStack.isEmpty() && !EquipmentCompareConfig.INSTANCE.blacklist.get().contains(itemStack.getItem().getRegistryName().toString()))
 		{
 			// If this is a piece of equipment and we are already wearing the same type, display an additional tooltip as well.
-			EquipmentSlotType slot = MobEntity.getEquipmentSlotForItem(itemStack);
+			EquipmentSlot slot = Mob.getEquipmentSlotForItem(itemStack);
 
 			List<ItemStack> equippedItems = new ArrayList<ItemStack>();
 			ItemStack equippedItem = minecraft.player.getItemBySlot(slot);
@@ -127,7 +130,7 @@ public class ComparisonTooltips
 			boolean checkItem = true;
 
 			// For held items, only check tools.
-			if (slot == EquipmentSlotType.MAINHAND)
+			if (slot == EquipmentSlot.MAINHAND)
 			{
 				// If they aren't both tools, don't compare them.
 				if (!(itemStack.getItem() instanceof TieredItem) || !(equippedItem.getItem() instanceof TieredItem))
@@ -169,7 +172,7 @@ public class ComparisonTooltips
 			{
 				try
 				{
-					equippedItems.addAll((List<ItemStack>) Class.forName("com.anthonyhilyard.equipmentcompare.BaublesHandler").getMethod("getBaublesMatchingSlot", PlayerEntity.class, ItemStack.class).invoke(null, minecraft.player, itemStack));
+					equippedItems.addAll((List<ItemStack>) Class.forName("com.anthonyhilyard.equipmentcompare.BaublesHandler").getMethod("getBaublesMatchingSlot", Player.class, ItemStack.class).invoke(null, minecraft.player, itemStack));
 				}
 				catch (Exception e)
 				{
@@ -186,52 +189,52 @@ public class ComparisonTooltips
 			if (!equippedItems.isEmpty() && (EquipmentCompare.tooltipActive ^ EquipmentCompareConfig.INSTANCE.defaultOn.get()))
 			{
 				int maxWidth = ((screen.width - (equippedItems.size() * 16)) / (equippedItems.size() + 1));
-				FontRenderer itemFont = itemStack.getItem().getFontRenderer(itemStack);
+				Font itemFont = RenderProperties.get(itemStack).getFont(itemStack);
 				if (itemFont == null)
 				{
 					itemFont = font;
 				}
 
-				List<ITextComponent> itemStackTooltipLines = screen.getTooltipFromItem(itemStack);
-				Rectangle2d itemStackRect = Tooltips.calculateRect(itemStack, matrixStack, itemStackTooltipLines, x, y, screen.width, screen.height, maxWidth, itemFont);
+				List<Component> itemStackTooltipLines = screen.getTooltipFromItem(itemStack);
+				Rect2i itemStackRect = Tooltips.calculateRect(itemStack, poseStack, itemStackTooltipLines, x, y, screen.width, screen.height, maxWidth, itemFont);
 				if (x + itemStackRect.getWidth() + 12 > screen.width)
 				{
-					itemStackRect = new Rectangle2d(screen.width - itemStackRect.getWidth() - 24, itemStackRect.getY(), itemStackRect.getWidth(), itemStackRect.getHeight());
+					itemStackRect = new Rect2i(screen.width - itemStackRect.getWidth() - 24, itemStackRect.getY(), itemStackRect.getWidth(), itemStackRect.getHeight());
 				}
 				else
 				{
-					itemStackRect = new Rectangle2d(itemStackRect.getX() - 2, itemStackRect.getY(), itemStackRect.getWidth(), itemStackRect.getHeight());
+					itemStackRect = new Rect2i(itemStackRect.getX() - 2, itemStackRect.getY(), itemStackRect.getWidth(), itemStackRect.getHeight());
 				}
 
-				Map<ItemStack, Rectangle2d> tooltipRects = new HashMap<ItemStack, Rectangle2d>();
-				Map<ItemStack, List<ITextComponent>> tooltipLines = new HashMap<ItemStack, List<ITextComponent>>();
+				Map<ItemStack, Rect2i> tooltipRects = new HashMap<ItemStack, Rect2i>();
+				Map<ItemStack, List<Component>> tooltipLines = new HashMap<ItemStack, List<Component>>();
 
-				Rectangle2d previousRect = itemStackRect;
+				Rect2i previousRect = itemStackRect;
 				boolean firstRect = true;
 
 				// Set up tooltip rects.
 				for (ItemStack thisItem : equippedItems)
 				{
-					if (thisItem.getItem().getFontRenderer(thisItem) != null)
+					if (RenderProperties.get(thisItem).getFont(thisItem) != null)
 					{
-						itemFont = thisItem.getItem().getFontRenderer(thisItem);
+						itemFont = RenderProperties.get(thisItem).getFont(thisItem);
 					}
 
-					List<ITextComponent> equippedTooltipLines = screen.getTooltipFromItem(thisItem);
-					Rectangle2d equippedRect = Tooltips.calculateRect(itemStack, matrixStack, equippedTooltipLines, x - previousRect.getWidth() - 14, y, screen.width, screen.height, maxWidth, itemFont);
-					StringTextComponent equippedBadge = new StringTextComponent(EquipmentCompareConfig.INSTANCE.badgeText.get());
+					List<Component> equippedTooltipLines = screen.getTooltipFromItem(thisItem);
+					Rect2i equippedRect = Tooltips.calculateRect(itemStack, poseStack, equippedTooltipLines, x - previousRect.getWidth() - 14, y, screen.width, screen.height, maxWidth, itemFont);
+					MutableComponent equippedBadge = new TextComponent(EquipmentCompareConfig.INSTANCE.badgeText.get());
 					
 					// Fix equippedRect x coordinate.
 					int tooltipWidth = equippedRect.getWidth();
-					equippedRect = new Rectangle2d(equippedRect.getX(), equippedRect.getY(), Math.max(equippedRect.getWidth(), itemFont.width(equippedBadge) + 8), equippedRect.getHeight());
+					equippedRect = new Rect2i(equippedRect.getX(), equippedRect.getY(), Math.max(equippedRect.getWidth(), itemFont.width(equippedBadge) + 8), equippedRect.getHeight());
 					if (firstRect)
 					{
-						equippedRect = new Rectangle2d(previousRect.getX() - equippedRect.getWidth() - 16 - (equippedRect.getWidth() - tooltipWidth) / 2, equippedRect.getY(), equippedRect.getWidth(), equippedRect.getHeight());
+						equippedRect = new Rect2i(previousRect.getX() - equippedRect.getWidth() - 16 - (equippedRect.getWidth() - tooltipWidth) / 2, equippedRect.getY(), equippedRect.getWidth(), equippedRect.getHeight());
 						firstRect = false;
 					}
 					else
 					{
-						equippedRect = new Rectangle2d(previousRect.getX() - equippedRect.getWidth() - 4 - (equippedRect.getWidth() - tooltipWidth) / 2, equippedRect.getY(), equippedRect.getWidth(), equippedRect.getHeight());
+						equippedRect = new Rect2i(previousRect.getX() - equippedRect.getWidth() - 4 - (equippedRect.getWidth() - tooltipWidth) / 2, equippedRect.getY(), equippedRect.getWidth(), equippedRect.getHeight());
 					}
 
 					tooltipRects.put(thisItem, equippedRect);
@@ -247,20 +250,20 @@ public class ComparisonTooltips
 					// Move the equipped rects.
 					for (ItemStack thisItem : equippedItems)
 					{
-						Rectangle2d equippedRect = tooltipRects.get(thisItem);
-						tooltipRects.replace(thisItem, new Rectangle2d(equippedRect.getX() + xOffset, equippedRect.getY(), equippedRect.getWidth(), equippedRect.getHeight()));
+						Rect2i equippedRect = tooltipRects.get(thisItem);
+						tooltipRects.replace(thisItem, new Rect2i(equippedRect.getX() + xOffset, equippedRect.getY(), equippedRect.getWidth(), equippedRect.getHeight()));
 					}
 
 					// Move the hovered item rect.
-					itemStackRect = new Rectangle2d(itemStackRect.getX() + xOffset, itemStackRect.getY(), itemStackRect.getWidth(), itemStackRect.getHeight());
+					itemStackRect = new Rect2i(itemStackRect.getX() + xOffset, itemStackRect.getY(), itemStackRect.getWidth(), itemStackRect.getHeight());
 				}
 
 				// Now draw them all.
 				for (ItemStack thisItem : equippedItems)
 				{
-					drawTooltip(matrixStack, thisItem, tooltipRects.get(thisItem), tooltipLines.get(thisItem), font, screen, maxWidth, true);
+					drawTooltip(poseStack, thisItem, tooltipRects.get(thisItem), tooltipLines.get(thisItem), font, screen, maxWidth, true);
 				}
-				drawTooltip(matrixStack, itemStack, itemStackRect, itemStackTooltipLines, font, screen, maxWidth, false);
+				drawTooltip(poseStack, itemStack, itemStackRect, itemStackTooltipLines, font, screen, maxWidth, false);
 
 				return true;
 			}

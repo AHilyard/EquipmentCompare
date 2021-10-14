@@ -8,13 +8,13 @@ import com.electronwill.nightconfig.core.Config;
 
 import org.apache.commons.lang3.tuple.Pair;
 
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 import net.minecraftforge.common.ForgeConfigSpec.LongValue;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.config.IConfigEvent;
 
 public class EquipmentCompareConfig
 {
@@ -58,7 +58,7 @@ public class EquipmentCompareConfig
 	}
 
 	@SubscribeEvent
-	public static void onLoad(ModConfig.Loading e)
+	public static void onLoad(IConfigEvent e)
 	{
 		if (e.getConfig().getModId().equals(Loader.MODID))
 		{

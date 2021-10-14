@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Set;
 
 import top.theillusivec4.curios.api.CuriosApi;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandlerModifiable;
 

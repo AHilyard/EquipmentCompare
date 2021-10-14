@@ -1,11 +1,11 @@
 package com.anthonyhilyard.equipmentcompare;
 
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.client.util.InputMappings;
+import net.minecraft.client.KeyMapping;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraftforge.client.event.InputEvent.KeyInputEvent;
 import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fmlclient.registry.ClientRegistry;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 import org.apache.logging.log4j.LogManager;
@@ -18,7 +18,7 @@ public class EquipmentCompare
 	@SuppressWarnings("unused")
 	public static final Logger LOGGER = LogManager.getLogger();
 	public static boolean tooltipActive = false;
-	private static final KeyBinding showComparisonTooltip = new KeyBinding("Show comparison tooltip", KeyConflictContext.GUI, InputMappings.Type.KEYSYM.getOrCreate(GLFW.GLFW_KEY_LEFT_SHIFT), "key.categories.inventory");
+	private static final KeyMapping showComparisonTooltip = new KeyMapping("Show comparison tooltip", KeyConflictContext.GUI, InputConstants.Type.KEYSYM.getOrCreate(GLFW.GLFW_KEY_LEFT_SHIFT), "key.categories.inventory");
 
 	public void onClientSetup(FMLClientSetupEvent event)
 	{

@@ -1,10 +1,10 @@
 modLoader="javafml"
-loaderVersion="[36,)"
+loaderVersion="[37,)"
 license="CC BY-NC-ND 4.0"
 
 [[mods]]
 modId="equipmentcompare"
-version="${version}"
+version="${file.jarVersion}"
 displayName="Equipment Compare"
 displayURL="https://anthonyhilyard.com/"
 updateJSONURL="https://mc-curse-update-checker.herokuapp.com/502561"
@@ -15,27 +15,27 @@ description='''Adds additional tooltips when hovering over equipment for easy co
 [[dependencies.equipmentcompare]]
 	modId="forge"
 	mandatory=true
-	versionRange="[36,)"
+	versionRange="[37,)"
 	ordering="NONE"
 	side="BOTH"
 
 [[dependencies.equipmentcompare]]
 	modId="minecraft"
 	mandatory=true
-	versionRange="[1.16.5]"
+	versionRange="[1.17.1]"
 	ordering="NONE"
 	side="BOTH"
 
 [[dependencies.equipmentcompare]]
 	modId="iceberg"
 	mandatory=true
-	versionRange="[1.0.10,)"
+	versionRange="[1.0.13,)"
 	ordering="NONE"
 	side="BOTH"
 
 [[dependencies.equipmentcompare]]
 	modId="baubles"
 	mandatory=false
-	versionRange="[1.8.7]"
+	versionRange="[1.9.0.1]"
 	ordering="NONE"
 	side="BOTH"
