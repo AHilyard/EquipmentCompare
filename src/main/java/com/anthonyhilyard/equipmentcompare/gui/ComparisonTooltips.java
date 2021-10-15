@@ -64,10 +64,6 @@ public class ComparisonTooltips
 
 			int badgeOffset = 0;
 
-			GuiUtils.drawGradientRect(matrix, -1, rect.getX() + 1,					 rect.getY() - 15 + badgeOffset, rect.getX() + rect.getWidth() - 1, rect.getY() - 14 + badgeOffset, bgColor, bgColor);
-			GuiUtils.drawGradientRect(matrix, -1, rect.getX(),						 rect.getY() - 14 + badgeOffset, rect.getX() + 1, 				  rect.getY() - 2 + badgeOffset,    bgColor, bgColor);
-			GuiUtils.drawGradientRect(matrix, -1, rect.getX() + rect.getWidth() - 1, rect.getY() - 14 + badgeOffset, rect.getX() + rect.getWidth(),	  rect.getY() - 2 + badgeOffset,    bgColor, bgColor);
-
 			// Draw the "equipped" badge.
 			// If legendary tooltips is installed, AND this item needs a custom border display the badge lower and without a border.
 			if (ModList.get().isLoaded("legendarytooltips"))
@@ -78,6 +74,9 @@ public class ComparisonTooltips
 					{
 						badgeOffset = 6;
 						bgColor = GuiUtils.DEFAULT_BACKGROUND_COLOR;
+						GuiUtils.drawGradientRect(matrix, -1, rect.getX() + 1,					 rect.getY() - 15 + badgeOffset, rect.getX() + rect.getWidth() - 1, rect.getY() - 14 + badgeOffset, bgColor, bgColor);
+						GuiUtils.drawGradientRect(matrix, -1, rect.getX(),						 rect.getY() - 14 + badgeOffset, rect.getX() + 1, 				  rect.getY() - 2 + badgeOffset,    bgColor, bgColor);
+						GuiUtils.drawGradientRect(matrix, -1, rect.getX() + rect.getWidth() - 1, rect.getY() - 14 + badgeOffset, rect.getX() + rect.getWidth(),	  rect.getY() - 2 + badgeOffset,    bgColor, bgColor);
 						GuiUtils.drawGradientRect(matrix, -1, rect.getX() + 1, rect.getY() - 14 + badgeOffset, rect.getX() + rect.getWidth() - 1, rect.getY() - 4 + badgeOffset,  bgColor, bgColor);
 					}
 				}
@@ -88,6 +87,9 @@ public class ComparisonTooltips
 			}
 			else
 			{
+				GuiUtils.drawGradientRect(matrix, -1, rect.getX() + 1,					 rect.getY() - 15 + badgeOffset, rect.getX() + rect.getWidth() - 1, rect.getY() - 14 + badgeOffset, bgColor, bgColor);
+				GuiUtils.drawGradientRect(matrix, -1, rect.getX(),						 rect.getY() - 14 + badgeOffset, rect.getX() + 1, 				  rect.getY() - 2 + badgeOffset,    bgColor, bgColor);
+				GuiUtils.drawGradientRect(matrix, -1, rect.getX() + rect.getWidth() - 1, rect.getY() - 14 + badgeOffset, rect.getX() + rect.getWidth(),	  rect.getY() - 2 + badgeOffset,    bgColor, bgColor);
 				GuiUtils.drawGradientRect(matrix, -1, rect.getX() + 1,					 rect.getY() - 2 + badgeOffset,  rect.getX() + rect.getWidth() - 1, rect.getY() - 1 + badgeOffset,  bgColor, bgColor);
 				GuiUtils.drawGradientRect(matrix, -1, rect.getX() + 1,					 rect.getY() - 14 + badgeOffset, rect.getX() + rect.getWidth() - 1, rect.getY() - 2 + badgeOffset,  bgColor, bgColor);
 				GuiUtils.drawGradientRect(matrix, -1, rect.getX() + 1,					 rect.getY() - 13 + badgeOffset, rect.getX() + 2, 				  rect.getY() - 3 + badgeOffset,    borderStartColor, borderEndColor);
@@ -118,8 +120,8 @@ public class ComparisonTooltips
 		{
 			return false;
 		}
-
-		if (!itemStack.isEmpty() && !EquipmentCompareConfig.INSTANCE.blacklist.get().contains(itemStack.getItem().getRegistryName().toString()))
+		
+		if (minecraft.player.containerMenu.getCarried().isEmpty() && !itemStack.isEmpty() && !EquipmentCompareConfig.INSTANCE.blacklist.get().contains(itemStack.getItem().getRegistryName().toString()))
 		{
 			// If this is a piece of equipment and we are already wearing the same type, display an additional tooltip as well.
 			EquipmentSlot slot = Mob.getEquipmentSlotForItem(itemStack);
