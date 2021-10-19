@@ -68,22 +68,12 @@ public class ComparisonTooltips
 			// If legendary tooltips is installed, AND this item needs a custom border display the badge lower and without a border.
 			if (ModList.get().isLoaded("legendarytooltips"))
 			{
-				try
-				{
-					if ((boolean) Class.forName("com.anthonyhilyard.equipmentcompare.LegendaryTooltipsHandler").getMethod("shouldDisplayEquippedBorder", ItemStack.class).invoke(null, itemStack))
-					{
-						badgeOffset = 6;
-						bgColor = GuiUtils.DEFAULT_BACKGROUND_COLOR;
-						GuiUtils.drawGradientRect(matrix, -1, rect.getX() + 1,					 rect.getY() - 15 + badgeOffset, rect.getX() + rect.getWidth() - 1, rect.getY() - 14 + badgeOffset, bgColor, bgColor);
-						GuiUtils.drawGradientRect(matrix, -1, rect.getX(),						 rect.getY() - 14 + badgeOffset, rect.getX() + 1, 				  rect.getY() - 2 + badgeOffset,    bgColor, bgColor);
-						GuiUtils.drawGradientRect(matrix, -1, rect.getX() + rect.getWidth() - 1, rect.getY() - 14 + badgeOffset, rect.getX() + rect.getWidth(),	  rect.getY() - 2 + badgeOffset,    bgColor, bgColor);
-						GuiUtils.drawGradientRect(matrix, -1, rect.getX() + 1, rect.getY() - 14 + badgeOffset, rect.getX() + rect.getWidth() - 1, rect.getY() - 4 + badgeOffset,  bgColor, bgColor);
-					}
-				}
-				catch (Exception e)
-				{
-					EquipmentCompare.LOGGER.error(e);
-				}
+				badgeOffset = 6;
+				bgColor = GuiUtils.DEFAULT_BACKGROUND_COLOR;
+				GuiUtils.drawGradientRect(matrix, -1, rect.getX() + 1,					 rect.getY() - 15 + badgeOffset, rect.getX() + rect.getWidth() - 1, rect.getY() - 14 + badgeOffset, bgColor, bgColor);
+				GuiUtils.drawGradientRect(matrix, -1, rect.getX(),						 rect.getY() - 14 + badgeOffset, rect.getX() + 1, 				  rect.getY() - 2 + badgeOffset,    bgColor, bgColor);
+				GuiUtils.drawGradientRect(matrix, -1, rect.getX() + rect.getWidth() - 1, rect.getY() - 14 + badgeOffset, rect.getX() + rect.getWidth(),	  rect.getY() - 2 + badgeOffset,    bgColor, bgColor);
+				GuiUtils.drawGradientRect(matrix, -1, rect.getX() + 1, rect.getY() - 14 + badgeOffset, rect.getX() + rect.getWidth() - 1, rect.getY() - 4 + badgeOffset,  bgColor, bgColor);
 			}
 			else
 			{

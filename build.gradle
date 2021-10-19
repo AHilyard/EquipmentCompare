@@ -59,11 +59,10 @@ dependencies {
 	minecraft "net.minecraftforge:forge:${project.mcVersion}-${project.forgeVersion}"
 	annotationProcessor 'org.spongepowered:mixin:0.8.4:processor'
 
-	compileOnly 'curse.maven:iceberg-520110:3491123'
-	runtimeOnly 'curse.maven:iceberg-520110:3491123'
+	compileOnly 'curse.maven:iceberg-520110:3496382'
+	runtimeOnly 'curse.maven:iceberg-520110:3496382'
 	compileClasspath fg.deobf('curse.maven:curios-309927:3457073')
 	compileClasspath fg.deobf('curse.maven:baubles-366844:3423447')
-	// compileClasspath 'curse.maven:legendarytooltips-532127:3481460'
 }
 
 jar {
