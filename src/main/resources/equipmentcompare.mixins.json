@@ -2,7 +2,6 @@
 	"required": true,
 	"package": "com.anthonyhilyard.equipmentcompare.mixin",
 	"compatibilityLevel": "JAVA_8",
-	"refmap": "equipmentcompare.refmap.json",
 	"mixins": [
 		"ScreenMixin"
 	],

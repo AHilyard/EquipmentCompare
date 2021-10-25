@@ -1,45 +1,24 @@
 package com.anthonyhilyard.equipmentcompare;
 
 import net.minecraft.client.KeyMapping;
-import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraftforge.client.event.InputEvent.KeyInputEvent;
-import net.minecraftforge.client.settings.KeyConflictContext;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fmlclient.registry.ClientRegistry;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.mojang.blaze3d.platform.InputConstants;
+
 import org.lwjgl.glfw.GLFW;
 
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 
-public class EquipmentCompare
+
+public class EquipmentCompare implements ClientModInitializer
 {
-	@SuppressWarnings("unused")
-	public static final Logger LOGGER = LogManager.getLogger();
 	public static boolean tooltipActive = false;
-	private static final KeyMapping showComparisonTooltip = new KeyMapping("Show comparison tooltip", KeyConflictContext.GUI, InputConstants.Type.KEYSYM.getOrCreate(GLFW.GLFW_KEY_LEFT_SHIFT), "key.categories.inventory");
+	public static final KeyMapping showComparisonTooltip = KeyBindingHelper.registerKeyBinding(new KeyMapping("Show comparison tooltip",
+																InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_LEFT_SHIFT, KeyMapping.CATEGORY_INVENTORY));
 
-	public void onClientSetup(FMLClientSetupEvent event)
+	@Override
+	public void onInitializeClient()
 	{
-		ClientRegistry.registerKeyBinding(showComparisonTooltip);
-	}
-
-	@SubscribeEvent
-	public static void onKeyInput(KeyInputEvent event)
-	{
-		// For some reason GUI conflict context does not seem to work properly for modifier keys?
-		// In any case, this lower level approach works...
-		if (showComparisonTooltip.matches(event.getKey(), 0))
-		{
-			if (event.getAction() == GLFW.GLFW_PRESS)
-			{
-				tooltipActive = true;
-			}
-			else if (event.getAction() == GLFW.GLFW_RELEASE)
-			{
-				tooltipActive = false;
-			}
-		}
+		EquipmentCompareConfig.init();
 	}
 }

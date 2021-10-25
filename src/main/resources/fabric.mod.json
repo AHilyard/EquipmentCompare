@@ -1,0 +1,53 @@
+{
+	"schemaVersion": 1,
+	"id": "equipmentcompare",
+	"version": "${version}",
+
+	"name": "Equipment Compare",
+	"description": "Adds additional tooltips when hovering over equipment for easy comparisons.",
+	"authors": [ "Grend" ],
+	"contact": {
+		"homepage": "https://anthonyhilyard.com/",
+		"sources": "https://github.com/AHilyard/EquipmentCompare",
+		"discord": "https://discord.gg/S5NQjbXPnb"
+	},
+
+	"license": "CC BY-NC-ND 4.0",
+	"icon": "icon.png",
+
+	"environment": "client",
+
+	"entrypoints": {
+		"client": [
+			"com.anthonyhilyard.equipmentcompare.EquipmentCompare"
+		]
+	 },
+
+	"mixins": [
+		"equipmentcompare.mixins.json"
+	],
+
+	"depends": {
+		"fabricloader": ">=0.11.6",
+		"fabric": "*",
+		"minecraft": "1.17.x",
+		"java": ">=16",
+		"cloth-config2": ">=5.0",
+		"iceberg": ">=1.0.17"
+	},
+	"suggests": {
+		"trinkets": ">=3.0.4"
+	},
+	"custom": {
+		"modupdater": {
+			"strategy": "curseforge",
+			"projectID": 541329,
+			"strict": false
+		},
+		"modmenu": {
+			"links": {
+				"modmenu.discord": "https://discord.gg/S5NQjbXPnb"
+			}
+		}
+	}
+}
