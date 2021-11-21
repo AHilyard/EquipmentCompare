@@ -22,6 +22,7 @@
 			"com.anthonyhilyard.equipmentcompare.EquipmentCompare"
 		]
 	 },
+	 "accessWidener": "equipmentcompare.accesswidener",
 
 	"mixins": [
 		"equipmentcompare.mixins.json"

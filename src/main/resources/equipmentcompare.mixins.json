@@ -1,9 +1,10 @@
 {
 	"required": true,
 	"package": "com.anthonyhilyard.equipmentcompare.mixin",
-	"compatibilityLevel": "JAVA_8",
+	"compatibilityLevel": "JAVA_16",
 	"mixins": [
-		"ScreenMixin"
+		"ScreenMixin",
+		"KeyMappingMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

@@ -51,6 +51,10 @@ dependencies {
 	modApi "curse.maven:trinkets-341284:3446940"
 }
 
+loom {
+	accessWidenerPath = file("src/main/resources/${project.name.toLowerCase()}.accesswidener")
+}
+
 processResources {
 	inputs.property 'version', project.version
 
