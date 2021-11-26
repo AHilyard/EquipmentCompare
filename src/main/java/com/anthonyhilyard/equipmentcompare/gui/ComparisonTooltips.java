@@ -35,7 +35,6 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TieredItem;
 import com.mojang.math.Matrix4f;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.network.chat.Component;
@@ -58,6 +57,7 @@ public class ComparisonTooltips
 		
 		Style textColor = Style.EMPTY.withColor(TextColor.fromRgb((int)EquipmentCompareConfig.INSTANCE.badgeTextColor));
 		MutableComponent equippedBadge = new TextComponent(EquipmentCompareConfig.INSTANCE.badgeText).withStyle(textColor);
+		boolean constrainToRect = false;
 
 		if (showBadge)
 		{
@@ -81,6 +81,7 @@ public class ComparisonTooltips
 			// If legendary tooltips is installed, display the badge lower and without a border.
 			if (FabricLoader.getInstance().isModLoaded("legendarytooltips"))
 			{
+				constrainToRect = true;
 				badgeOffset = 6;
 				bgColor = DEFAULT_BACKGROUND_COLOR;
 				GuiHelper.drawGradientRect(matrix, bufferBuilder, rect.getX() + 1,					 rect.getY() - 15 + badgeOffset, rect.getX() + rect.getWidth() - 1, rect.getY() - 14 + badgeOffset, -1, bgColor, bgColor);
@@ -118,7 +119,7 @@ public class ComparisonTooltips
 			poseStack.popPose();
 		}
 
-		Tooltips.renderItemTooltip(itemStack, poseStack, new Tooltips.TooltipInfo(tooltipLines, font), rect, screen.width, screen.height, DEFAULT_BACKGROUND_COLOR, DEFAULT_BORDER_COLOR_START, DEFAULT_BORDER_COLOR_END, showBadge);
+		Tooltips.renderItemTooltip(itemStack, poseStack, new Tooltips.TooltipInfo(tooltipLines, font), rect, screen.width, screen.height, DEFAULT_BACKGROUND_COLOR, DEFAULT_BORDER_COLOR_START, DEFAULT_BORDER_COLOR_END, showBadge, constrainToRect);
 	}
 
 	public static boolean render(PoseStack poseStack, int x, int y, Slot hoveredSlot, Minecraft minecraft, Font font, Screen screen)
@@ -146,15 +147,16 @@ public class ComparisonTooltips
 		
 			boolean checkItem = true;
 
-			// For held items, only check tools.
+			// For held items, only check items with durability.
 			if (slot == EquipmentSlot.MAINHAND)
 			{
-				// If they aren't both tools, don't compare them.
-				if (!(itemStack.getItem() instanceof TieredItem) || !(equippedItem.getItem() instanceof TieredItem))
+				// Ensure both items are comparable.
+				// Any item with durability can be compared.
+				if (!itemStack.getItem().canBeDepleted() || !equippedItem.getItem().canBeDepleted())
 				{
 					checkItem = false;
 				}
-				// If strict comparisons are enabled, only compare tools of the same type.
+				// If strict comparisons are enabled, only compare items of the same type.
 				else if (EquipmentCompareConfig.INSTANCE.strict)
 				{
 					if (!itemStack.getItem().getClass().equals(equippedItem.getItem().getClass()))
@@ -234,6 +236,7 @@ public class ComparisonTooltips
 					// Fix equippedRect x coordinate.
 					int tooltipWidth = equippedRect.getWidth();
 					equippedRect = new Rect2i(equippedRect.getX(), equippedRect.getY(), Math.max(equippedRect.getWidth(), itemFont.width(equippedBadge) + 8), equippedRect.getHeight());
+
 					if (firstRect)
 					{
 						equippedRect = new Rect2i(previousRect.getX() - equippedRect.getWidth() - 16 - (equippedRect.getWidth() - tooltipWidth) / 2, equippedRect.getY(), equippedRect.getWidth(), equippedRect.getHeight());
