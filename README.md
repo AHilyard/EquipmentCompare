@@ -1,2 +1,2 @@
 # EquipmentCompare
-A mod for Minecraft 1.16.5 that makes it easier to compare equipment.
+A mod for Minecraft 1.18 that makes it easier to compare equipment.
