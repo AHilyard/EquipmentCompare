@@ -13,6 +13,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.Rect2i;
@@ -23,22 +24,19 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TieredItem;
 import com.mojang.math.Matrix4f;
 import net.minecraft.network.chat.TextColor;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.Style;
-import net.minecraftforge.fmlclient.gui.GuiUtils;
+import net.minecraftforge.client.gui.GuiUtils;
 import net.minecraftforge.client.RenderProperties;
 import net.minecraftforge.fml.ModList;
 
 public class ComparisonTooltips
 {
-	@SuppressWarnings("removal")
-	private static void drawTooltip(PoseStack poseStack, ItemStack itemStack, Rect2i rect, List<Component> tooltipLines, Font font, Screen screen, int maxWidth, boolean showBadge)
+	private static void drawTooltip(PoseStack poseStack, ItemStack itemStack, Rect2i rect, List<ClientTooltipComponent> tooltipLines, Font font, Screen screen, int maxWidth, boolean showBadge)
 	{
 		int bgColor = (int)EquipmentCompareConfig.INSTANCE.badgeBackgroundColor.get().longValue();
 		int borderStartColor = (int)EquipmentCompareConfig.INSTANCE.badgeBorderStartColor.get().longValue();
@@ -46,8 +44,7 @@ public class ComparisonTooltips
 		
 		Style textColor = Style.EMPTY.withColor(TextColor.fromRgb((int)EquipmentCompareConfig.INSTANCE.badgeTextColor.get().longValue()));
 		MutableComponent equippedBadge = new TextComponent(EquipmentCompareConfig.INSTANCE.badgeText.get()).withStyle(textColor);
-
-		GuiUtils.preItemToolTip(itemStack);
+		boolean constrainToRect = false;
 
 		if (showBadge)
 		{
@@ -68,32 +65,33 @@ public class ComparisonTooltips
 			// If legendary tooltips is installed, AND this item needs a custom border display the badge lower and without a border.
 			if (ModList.get().isLoaded("legendarytooltips"))
 			{
+				constrainToRect = true;
 				badgeOffset = 6;
 				bgColor = GuiUtils.DEFAULT_BACKGROUND_COLOR;
-				GuiUtils.drawGradientRect(matrix, -1, rect.getX() + 1,					 rect.getY() - 15 + badgeOffset, rect.getX() + rect.getWidth() - 1, rect.getY() - 14 + badgeOffset, bgColor, bgColor);
-				GuiUtils.drawGradientRect(matrix, -1, rect.getX(),						 rect.getY() - 14 + badgeOffset, rect.getX() + 1, 				  rect.getY() - 2 + badgeOffset,    bgColor, bgColor);
-				GuiUtils.drawGradientRect(matrix, -1, rect.getX() + rect.getWidth() - 1, rect.getY() - 14 + badgeOffset, rect.getX() + rect.getWidth(),	  rect.getY() - 2 + badgeOffset,    bgColor, bgColor);
-				GuiUtils.drawGradientRect(matrix, -1, rect.getX() + 1, rect.getY() - 14 + badgeOffset, rect.getX() + rect.getWidth() - 1, rect.getY() - 4 + badgeOffset,  bgColor, bgColor);
+				GuiUtils.drawGradientRect(matrix, -1, rect.getX() + 1,					 rect.getY() - 17 + badgeOffset, rect.getX() + rect.getWidth() + 7, rect.getY() - 16 + badgeOffset, bgColor, bgColor);
+				GuiUtils.drawGradientRect(matrix, -1, rect.getX(),						 rect.getY() - 16 + badgeOffset, rect.getX() + 1, 					rect.getY() - 4 + badgeOffset,  bgColor, bgColor);
+				GuiUtils.drawGradientRect(matrix, -1, rect.getX() + rect.getWidth() + 7, rect.getY() - 16 + badgeOffset, rect.getX() + rect.getWidth() + 8,	rect.getY() - 4 + badgeOffset,  bgColor, bgColor);
+				GuiUtils.drawGradientRect(matrix, -1, rect.getX() + 1,					 rect.getY() - 16 + badgeOffset, rect.getX() + rect.getWidth() + 7, rect.getY() - 6 + badgeOffset,  bgColor, bgColor);
 			}
 			else
 			{
-				GuiUtils.drawGradientRect(matrix, -1, rect.getX() + 1,					 rect.getY() - 15 + badgeOffset, rect.getX() + rect.getWidth() - 1, rect.getY() - 14 + badgeOffset, bgColor, bgColor);
-				GuiUtils.drawGradientRect(matrix, -1, rect.getX(),						 rect.getY() - 14 + badgeOffset, rect.getX() + 1, 				  rect.getY() - 2 + badgeOffset,    bgColor, bgColor);
-				GuiUtils.drawGradientRect(matrix, -1, rect.getX() + rect.getWidth() - 1, rect.getY() - 14 + badgeOffset, rect.getX() + rect.getWidth(),	  rect.getY() - 2 + badgeOffset,    bgColor, bgColor);
-				GuiUtils.drawGradientRect(matrix, -1, rect.getX() + 1,					 rect.getY() - 2 + badgeOffset,  rect.getX() + rect.getWidth() - 1, rect.getY() - 1 + badgeOffset,  bgColor, bgColor);
-				GuiUtils.drawGradientRect(matrix, -1, rect.getX() + 1,					 rect.getY() - 14 + badgeOffset, rect.getX() + rect.getWidth() - 1, rect.getY() - 2 + badgeOffset,  bgColor, bgColor);
-				GuiUtils.drawGradientRect(matrix, -1, rect.getX() + 1,					 rect.getY() - 13 + badgeOffset, rect.getX() + 2, 				  rect.getY() - 3 + badgeOffset,    borderStartColor, borderEndColor);
-				GuiUtils.drawGradientRect(matrix, -1, rect.getX() + rect.getWidth() - 2, rect.getY() - 13 + badgeOffset, rect.getX() + rect.getWidth() - 1, rect.getY() - 3 + badgeOffset,  borderStartColor, borderEndColor);
-				GuiUtils.drawGradientRect(matrix, -1, rect.getX() + 1,					 rect.getY() - 14 + badgeOffset, rect.getX() + rect.getWidth() - 1, rect.getY() - 13 + badgeOffset, borderStartColor, borderStartColor);
-				GuiUtils.drawGradientRect(matrix, -1, rect.getX() + 1,					 rect.getY() - 3 + badgeOffset,  rect.getX() + rect.getWidth() - 1, rect.getY() - 2 + badgeOffset,  borderEndColor,   borderEndColor);
+				GuiUtils.drawGradientRect(matrix, -1, rect.getX() + 1,					 rect.getY() - 17 + badgeOffset, rect.getX() + rect.getWidth() + 7, rect.getY() - 16 + badgeOffset, bgColor, bgColor);
+				GuiUtils.drawGradientRect(matrix, -1, rect.getX(),						 rect.getY() - 16 + badgeOffset, rect.getX() + 1, 					rect.getY() - 4 + badgeOffset,  bgColor, bgColor);
+				GuiUtils.drawGradientRect(matrix, -1, rect.getX() + rect.getWidth() + 7, rect.getY() - 16 + badgeOffset, rect.getX() + rect.getWidth() + 8,	rect.getY() - 4 + badgeOffset,  bgColor, bgColor);
+				GuiUtils.drawGradientRect(matrix, -1, rect.getX() + 1,					 rect.getY() - 4 + badgeOffset,  rect.getX() + rect.getWidth() + 7, rect.getY() - 3 + badgeOffset,  bgColor, bgColor);
+				GuiUtils.drawGradientRect(matrix, -1, rect.getX() + 1,					 rect.getY() - 16 + badgeOffset, rect.getX() + rect.getWidth() + 7, rect.getY() - 4 + badgeOffset,  bgColor, bgColor);
+				GuiUtils.drawGradientRect(matrix, -1, rect.getX() + 1,					 rect.getY() - 15 + badgeOffset, rect.getX() + 2, 					rect.getY() - 5 + badgeOffset,  borderStartColor, borderEndColor);
+				GuiUtils.drawGradientRect(matrix, -1, rect.getX() + rect.getWidth() + 6, rect.getY() - 15 + badgeOffset, rect.getX() + rect.getWidth() + 7, rect.getY() - 5 + badgeOffset,  borderStartColor, borderEndColor);
+				GuiUtils.drawGradientRect(matrix, -1, rect.getX() + 1,					 rect.getY() - 16 + badgeOffset, rect.getX() + rect.getWidth() + 7, rect.getY() - 15 + badgeOffset, borderStartColor, borderStartColor);
+				GuiUtils.drawGradientRect(matrix, -1, rect.getX() + 1,					 rect.getY() - 5 + badgeOffset,  rect.getX() + rect.getWidth() + 7, rect.getY() - 4 + badgeOffset,  borderEndColor,   borderEndColor);
 			}
 
-			font.drawInBatch(Language.getInstance().getVisualOrder(equippedBadge), (float)rect.getX() + (rect.getWidth() - font.width(equippedBadge)) / 2, (float)rect.getY() - 12 + badgeOffset, -1, true, poseStack.last().pose(), renderType, false, 0x000000, 0xF000F0);
+			font.drawInBatch(Language.getInstance().getVisualOrder(equippedBadge), (float)rect.getX() + (rect.getWidth() - font.width(equippedBadge) + 7) / 2, (float)rect.getY() - 14 + badgeOffset, -1, true, poseStack.last().pose(), renderType, false, 0x000000, 0xF000F0);
 			renderType.endBatch();
 			poseStack.popPose();
 		}
 
-		Tooltips.renderItemTooltip(itemStack, poseStack, new Tooltips.TooltipInfo(tooltipLines, font), rect, screen.width, screen.height, GuiUtils.DEFAULT_BACKGROUND_COLOR, GuiUtils.DEFAULT_BORDER_COLOR_START, GuiUtils.DEFAULT_BORDER_COLOR_END, showBadge);
+		Tooltips.renderItemTooltip(itemStack, poseStack, new Tooltips.TooltipInfo(tooltipLines, font), rect, screen.width, screen.height, GuiUtils.DEFAULT_BACKGROUND_COLOR, GuiUtils.DEFAULT_BORDER_COLOR_START, GuiUtils.DEFAULT_BORDER_COLOR_END, showBadge, constrainToRect);
 	}
 
 	public static boolean render(PoseStack poseStack, int x, int y, Slot hoveredSlot, Minecraft minecraft, Font font, Screen screen)
@@ -121,15 +119,16 @@ public class ComparisonTooltips
 		
 			boolean checkItem = true;
 
-			// For held items, only check tools.
+			// For held items, only check items with durability.
 			if (slot == EquipmentSlot.MAINHAND)
 			{
-				// If they aren't both tools, don't compare them.
-				if (!(itemStack.getItem() instanceof TieredItem) || !(equippedItem.getItem() instanceof TieredItem))
+				// Ensure both items are comparable.
+				// Any item with durability can be compared.
+				if (!itemStack.getItem().canBeDepleted() || !equippedItem.getItem().canBeDepleted())
 				{
 					checkItem = false;
 				}
-				// If strict comparisons are enabled, only compare tools of the same type.
+				// If strict comparisons are enabled, only compare items of the same type.
 				else if (EquipmentCompareConfig.INSTANCE.strict.get())
 				{
 					if (!itemStack.getItem().getClass().equals(equippedItem.getItem().getClass()))
@@ -187,7 +186,7 @@ public class ComparisonTooltips
 					itemFont = font;
 				}
 
-				List<Component> itemStackTooltipLines = screen.getTooltipFromItem(itemStack);
+				List<ClientTooltipComponent> itemStackTooltipLines = Tooltips.gatherTooltipComponents(itemStack, screen.getTooltipFromItem(itemStack), itemStack.getTooltipImage(), x, screen.width, screen.height, itemFont, font, maxWidth);
 				Rect2i itemStackRect = Tooltips.calculateRect(itemStack, poseStack, itemStackTooltipLines, x, y, screen.width, screen.height, maxWidth, itemFont);
 				if (x + itemStackRect.getWidth() + 12 > screen.width)
 				{
@@ -199,7 +198,7 @@ public class ComparisonTooltips
 				}
 
 				Map<ItemStack, Rect2i> tooltipRects = new HashMap<ItemStack, Rect2i>();
-				Map<ItemStack, List<Component>> tooltipLines = new HashMap<ItemStack, List<Component>>();
+				Map<ItemStack, List<ClientTooltipComponent>> tooltipLines = new HashMap<ItemStack, List<ClientTooltipComponent>>();
 
 				Rect2i previousRect = itemStackRect;
 				boolean firstRect = true;
@@ -212,13 +211,14 @@ public class ComparisonTooltips
 						itemFont = RenderProperties.get(thisItem).getFont(thisItem);
 					}
 
-					List<Component> equippedTooltipLines = screen.getTooltipFromItem(thisItem);
+					List<ClientTooltipComponent> equippedTooltipLines = Tooltips.gatherTooltipComponents(thisItem, screen.getTooltipFromItem(thisItem), thisItem.getTooltipImage(), x - previousRect.getWidth() - 14, screen.width, screen.height, itemFont, font, maxWidth);
 					Rect2i equippedRect = Tooltips.calculateRect(itemStack, poseStack, equippedTooltipLines, x - previousRect.getWidth() - 14, y, screen.width, screen.height, maxWidth, itemFont);
 					MutableComponent equippedBadge = new TextComponent(EquipmentCompareConfig.INSTANCE.badgeText.get());
 					
 					// Fix equippedRect x coordinate.
 					int tooltipWidth = equippedRect.getWidth();
 					equippedRect = new Rect2i(equippedRect.getX(), equippedRect.getY(), Math.max(equippedRect.getWidth(), itemFont.width(equippedBadge) + 8), equippedRect.getHeight());
+
 					if (firstRect)
 					{
 						equippedRect = new Rect2i(previousRect.getX() - equippedRect.getWidth() - 16 - (equippedRect.getWidth() - tooltipWidth) / 2, equippedRect.getY(), equippedRect.getWidth(), equippedRect.getHeight());

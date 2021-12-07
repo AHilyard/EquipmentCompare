@@ -1,8 +1,7 @@
 buildscript {
 	repositories {
-		maven { url = 'https://files.minecraftforge.net/maven' }
+		maven { url = 'https://maven.minecraftforge.net' }
 		maven { url = "https://repo.spongepowered.org/maven" }
-		jcenter()
 		mavenCentral()
 	}
 	dependencies {
@@ -16,7 +15,7 @@ apply plugin: 'eclipse'
 
 archivesBaseName = project.name + '-' + project.mcVersion
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(16)
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 mixin {
 	add sourceSets.main, "${project.name.toLowerCase()}.refmap.json"
@@ -59,9 +58,9 @@ dependencies {
 	minecraft "net.minecraftforge:forge:${project.mcVersion}-${project.forgeVersion}"
 	annotationProcessor 'org.spongepowered:mixin:0.8.4:processor'
 
-	implementation 'curse.maven:iceberg-520110:3496382'
-	compileClasspath fg.deobf('curse.maven:curios-309927:3457073')
-	compileClasspath fg.deobf('curse.maven:baubles-366844:3423447')
+	implementation fg.deobf('curse.maven:iceberg-520110:3553159')
+	compileClasspath fg.deobf('curse.maven:curios-309927:3551144')
+	compileClasspath fg.deobf('curse.maven:baubles-366844:3545502')
 }
 
 jar {
