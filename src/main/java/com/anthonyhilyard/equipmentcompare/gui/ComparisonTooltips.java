@@ -36,7 +36,7 @@ import net.minecraftforge.fml.ModList;
 
 public class ComparisonTooltips
 {
-	private static void drawTooltip(PoseStack poseStack, ItemStack itemStack, Rect2i rect, List<ClientTooltipComponent> tooltipLines, Font font, Screen screen, int maxWidth, boolean showBadge)
+	private static void drawTooltip(PoseStack poseStack, ItemStack itemStack, Rect2i rect, List<ClientTooltipComponent> tooltipLines, Font font, Screen screen, int maxWidth, boolean showBadge, boolean centeredTitle, int index)
 	{
 		int bgColor = (int)EquipmentCompareConfig.INSTANCE.badgeBackgroundColor.get().longValue();
 		int borderStartColor = (int)EquipmentCompareConfig.INSTANCE.badgeBorderStartColor.get().longValue();
@@ -91,7 +91,7 @@ public class ComparisonTooltips
 			poseStack.popPose();
 		}
 
-		Tooltips.renderItemTooltip(itemStack, poseStack, new Tooltips.TooltipInfo(tooltipLines, font), rect, screen.width, screen.height, GuiUtils.DEFAULT_BACKGROUND_COLOR, GuiUtils.DEFAULT_BORDER_COLOR_START, GuiUtils.DEFAULT_BORDER_COLOR_END, showBadge, constrainToRect);
+		Tooltips.renderItemTooltip(itemStack, poseStack, new Tooltips.TooltipInfo(tooltipLines, font), rect, screen.width, screen.height, GuiUtils.DEFAULT_BACKGROUND_COLOR, GuiUtils.DEFAULT_BACKGROUND_COLOR, GuiUtils.DEFAULT_BORDER_COLOR_START, GuiUtils.DEFAULT_BORDER_COLOR_END, showBadge, constrainToRect, centeredTitle, index);
 	}
 
 	public static boolean render(PoseStack poseStack, int x, int y, Slot hoveredSlot, Minecraft minecraft, Font font, Screen screen)
@@ -186,8 +186,24 @@ public class ComparisonTooltips
 					itemFont = font;
 				}
 
-				List<ClientTooltipComponent> itemStackTooltipLines = Tooltips.gatherTooltipComponents(itemStack, screen.getTooltipFromItem(itemStack), itemStack.getTooltipImage(), x, screen.width, screen.height, itemFont, font, maxWidth);
-				Rect2i itemStackRect = Tooltips.calculateRect(itemStack, poseStack, itemStackTooltipLines, x, y, screen.width, screen.height, maxWidth, itemFont);
+				boolean centeredTitle = false, enforceMinimumWidth = false;
+
+				// If Legendary Tooltips is loaded, check if we need to center the title or enforce a minimum width.
+				if (ModList.get().isLoaded("legendarytooltips"))
+				{
+					try
+					{
+						centeredTitle = (boolean)Class.forName("com.anthonyhilyard.equipmentcompare.LegendaryTooltipsHandler").getMethod("getCenteredTitle").invoke(null, new Object[]{});
+						enforceMinimumWidth = (boolean)Class.forName("com.anthonyhilyard.equipmentcompare.LegendaryTooltipsHandler").getMethod("getEnforceMinimumWidth").invoke(null, new Object[]{});
+					}
+					catch (Exception e)
+					{
+						EquipmentCompare.LOGGER.error(e);
+					}
+				}
+
+				List<ClientTooltipComponent> itemStackTooltipLines = Tooltips.gatherTooltipComponents(itemStack, screen.getTooltipFromItem(itemStack), itemStack.getTooltipImage(), x, screen.width, screen.height, itemFont, font, maxWidth, 0);
+				Rect2i itemStackRect = Tooltips.calculateRect(itemStack, poseStack, itemStackTooltipLines, x, y, screen.width, screen.height, maxWidth, itemFont, enforceMinimumWidth ? 48 : 0, centeredTitle);
 				if (x + itemStackRect.getWidth() + 12 > screen.width)
 				{
 					itemStackRect = new Rect2i(screen.width - itemStackRect.getWidth() - 24, itemStackRect.getY(), itemStackRect.getWidth(), itemStackRect.getHeight());
@@ -203,6 +219,9 @@ public class ComparisonTooltips
 				Rect2i previousRect = itemStackRect;
 				boolean firstRect = true;
 
+				// Keep track of the tooltip index.
+				int tooltipIndex = 1;
+
 				// Set up tooltip rects.
 				for (ItemStack thisItem : equippedItems)
 				{
@@ -211,8 +230,8 @@ public class ComparisonTooltips
 						itemFont = RenderProperties.get(thisItem).getFont(thisItem);
 					}
 
-					List<ClientTooltipComponent> equippedTooltipLines = Tooltips.gatherTooltipComponents(thisItem, screen.getTooltipFromItem(thisItem), thisItem.getTooltipImage(), x - previousRect.getWidth() - 14, screen.width, screen.height, itemFont, font, maxWidth);
-					Rect2i equippedRect = Tooltips.calculateRect(itemStack, poseStack, equippedTooltipLines, x - previousRect.getWidth() - 14, y, screen.width, screen.height, maxWidth, itemFont);
+					List<ClientTooltipComponent> equippedTooltipLines = Tooltips.gatherTooltipComponents(thisItem, screen.getTooltipFromItem(thisItem), thisItem.getTooltipImage(), x - previousRect.getWidth() - 14, screen.width, screen.height, itemFont, font, maxWidth, tooltipIndex++);
+					Rect2i equippedRect = Tooltips.calculateRect(itemStack, poseStack, equippedTooltipLines, x - previousRect.getWidth() - 14, y, screen.width, screen.height, maxWidth, itemFont, enforceMinimumWidth ? 48 : 0, centeredTitle);
 					MutableComponent equippedBadge = new TextComponent(EquipmentCompareConfig.INSTANCE.badgeText.get());
 					
 					// Fix equippedRect x coordinate.
@@ -250,12 +269,14 @@ public class ComparisonTooltips
 					itemStackRect = new Rect2i(itemStackRect.getX() + xOffset, itemStackRect.getY(), itemStackRect.getWidth(), itemStackRect.getHeight());
 				}
 
+				tooltipIndex = 1;
+
 				// Now draw them all.
 				for (ItemStack thisItem : equippedItems)
 				{
-					drawTooltip(poseStack, thisItem, tooltipRects.get(thisItem), tooltipLines.get(thisItem), font, screen, maxWidth, true);
+					drawTooltip(poseStack, thisItem, tooltipRects.get(thisItem), tooltipLines.get(thisItem), font, screen, maxWidth, true, centeredTitle, tooltipIndex++);
 				}
-				drawTooltip(poseStack, itemStack, itemStackRect, itemStackTooltipLines, font, screen, maxWidth, false);
+				drawTooltip(poseStack, itemStack, itemStackRect, itemStackTooltipLines, font, screen, maxWidth, false, centeredTitle, 0);
 
 				return true;
 			}
