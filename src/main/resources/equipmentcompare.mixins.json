@@ -2,13 +2,13 @@
 	"required": true,
 	"package": "com.anthonyhilyard.equipmentcompare.mixin",
 	"compatibilityLevel": "JAVA_16",
-	"mixins": [
+	"client": [
 		"ScreenMixin",
 		"KeyMappingMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
 	},
-	"minVersion": "0.8",
+	"minVersion": "0.8.4",
 	"target": "@env(DEFAULT)"
 }

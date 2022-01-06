@@ -34,10 +34,11 @@
 		"minecraft": "1.18.x",
 		"java": ">=17",
 		"cloth-config2": ">=6.0",
-		"iceberg": ">=1.0.27"
+		"iceberg": ">=1.0.35"
 	},
 	"suggests": {
-		"trinkets": ">=3.1.0"
+		"trinkets": ">=3.1.0",
+		"legendarytooltips": ">=1.2.1"
 	},
 	"custom": {
 		"modupdater": {
