@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.anthonyhilyard.equipmentcompare.EquipmentCompare;
 import com.anthonyhilyard.equipmentcompare.EquipmentCompareConfig;
+import com.anthonyhilyard.iceberg.events.RenderTooltipExtEvent;
 import com.anthonyhilyard.iceberg.util.Tooltips;
 import com.mojang.blaze3d.vertex.PoseStack;
 
@@ -31,6 +32,7 @@ import net.minecraft.locale.Language;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraftforge.client.gui.GuiUtils;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.client.RenderProperties;
 import net.minecraftforge.fml.ModList;
 
@@ -65,9 +67,20 @@ public class ComparisonTooltips
 			// If legendary tooltips is installed, AND this item needs a custom border display the badge lower and without a border.
 			if (ModList.get().isLoaded("legendarytooltips"))
 			{
+				// Fire a color event to properly update the background color if needed.
+				RenderTooltipExtEvent.Color colorEvent = new RenderTooltipExtEvent.Color(itemStack, poseStack, rect.getX(), rect.getY(), font, bgColor, borderStartColor, borderEndColor, tooltipLines, showBadge, index);
+				if (!MinecraftForge.EVENT_BUS.post(colorEvent))
+				{
+					bgColor = colorEvent.getBackgroundStart();
+				}
+				else
+				{
+					bgColor = GuiUtils.DEFAULT_BACKGROUND_COLOR;
+				}
+
 				constrainToRect = true;
 				badgeOffset = 6;
-				bgColor = GuiUtils.DEFAULT_BACKGROUND_COLOR;
+
 				GuiUtils.drawGradientRect(matrix, -1, rect.getX() + 1,					 rect.getY() - 17 + badgeOffset, rect.getX() + rect.getWidth() + 7, rect.getY() - 16 + badgeOffset, bgColor, bgColor);
 				GuiUtils.drawGradientRect(matrix, -1, rect.getX(),						 rect.getY() - 16 + badgeOffset, rect.getX() + 1, 					rect.getY() - 4 + badgeOffset,  bgColor, bgColor);
 				GuiUtils.drawGradientRect(matrix, -1, rect.getX() + rect.getWidth() + 7, rect.getY() - 16 + badgeOffset, rect.getX() + rect.getWidth() + 8,	rect.getY() - 4 + badgeOffset,  bgColor, bgColor);
@@ -85,8 +98,8 @@ public class ComparisonTooltips
 				GuiUtils.drawGradientRect(matrix, -1, rect.getX() + 1,					 rect.getY() - 16 + badgeOffset, rect.getX() + rect.getWidth() + 7, rect.getY() - 15 + badgeOffset, borderStartColor, borderStartColor);
 				GuiUtils.drawGradientRect(matrix, -1, rect.getX() + 1,					 rect.getY() - 5 + badgeOffset,  rect.getX() + rect.getWidth() + 7, rect.getY() - 4 + badgeOffset,  borderEndColor,   borderEndColor);
 			}
-
-			font.drawInBatch(Language.getInstance().getVisualOrder(equippedBadge), (float)rect.getX() + (rect.getWidth() - font.width(equippedBadge) + 7) / 2, (float)rect.getY() - 14 + badgeOffset, -1, true, poseStack.last().pose(), renderType, false, 0x000000, 0xF000F0);
+			
+			font.drawInBatch(Language.getInstance().getVisualOrder(equippedBadge), (float)rect.getX() + (rect.getWidth() - font.width(equippedBadge)) / 2 + 4, (float)rect.getY() - 14 + badgeOffset, -1, true, poseStack.last().pose(), renderType, false, 0x000000, 0xF000F0);
 			renderType.endBatch();
 			poseStack.popPose();
 		}

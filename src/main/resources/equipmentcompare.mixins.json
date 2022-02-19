@@ -3,7 +3,7 @@
 	"package": "com.anthonyhilyard.equipmentcompare.mixin",
 	"compatibilityLevel": "JAVA_16",
 	"refmap": "equipmentcompare.refmap.json",
-	"mixins": [
+	"client": [
 		"ScreenMixin"
 	],
 	"injectors": {
