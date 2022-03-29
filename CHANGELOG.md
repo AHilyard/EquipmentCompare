@@ -1,5 +1,8 @@
 # Changelog
 
+### 1.2.12
+- Fixed an incompatibility with newer versions of Trinkets that was causing log spam and a memory leak.
+
 ### 1.2.11
 - Fixed a bug where the equipped badge's background color did not match custom Legendary Tooltips background colors.
 - Updated mod icon.

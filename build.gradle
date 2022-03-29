@@ -46,11 +46,9 @@ dependencies {
 	modApi "curse.maven:legendarytooltips-542478:3595477"
 
 	// These are all needed for Trinkets.
-	modApi "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-base:${project.ccaVersion}"
-	include "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-base:${project.ccaVersion}"
-	modApi "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-entity:${project.ccaVersion}"
-	include "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-entity:${project.ccaVersion}"
-	modApi "curse.maven:trinkets-341284:3542826"
+	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:${project.ccaVersion}")
+	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:${project.ccaVersion}")
+	modApi "curse.maven:trinkets-341284:3669842"
 }
 
 loom {

@@ -31,6 +31,9 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import com.mojang.math.Matrix4f;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.locale.Language;
@@ -171,7 +174,7 @@ public class ComparisonTooltips
 				}
 				catch (Exception e)
 				{
-					Loader.LOGGER.error(e);
+					Loader.LOGGER.error(ExceptionUtils.getStackTrace(e));
 				}
 			}
 
