@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.anthonyhilyard.equipmentcompare.EquipmentCompare;
 import com.anthonyhilyard.equipmentcompare.EquipmentCompareConfig;
+import com.anthonyhilyard.equipmentcompare.Loader;
 import com.anthonyhilyard.iceberg.events.RenderTooltipExtEvent;
 import com.anthonyhilyard.iceberg.util.Tooltips;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -26,15 +27,19 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import com.mojang.math.Matrix4f;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.locale.Language;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraftforge.client.gui.GuiUtils;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.client.RenderProperties;
 import net.minecraftforge.fml.ModList;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class ComparisonTooltips
 {
@@ -45,7 +50,17 @@ public class ComparisonTooltips
 		int borderEndColor = (int)EquipmentCompareConfig.INSTANCE.badgeBorderEndColor.get().longValue();
 		
 		Style textColor = Style.EMPTY.withColor(TextColor.fromRgb((int)EquipmentCompareConfig.INSTANCE.badgeTextColor.get().longValue()));
-		MutableComponent equippedBadge = new TextComponent(EquipmentCompareConfig.INSTANCE.badgeText.get()).withStyle(textColor);
+		
+		MutableComponent equippedBadge;
+		if (EquipmentCompareConfig.INSTANCE.overrideBadgeText.get())
+		{
+			equippedBadge = Component.literal(EquipmentCompareConfig.INSTANCE.badgeText.get()).withStyle(textColor);
+		}
+		else
+		{
+			equippedBadge = Component.translatable("equipmentcompare.general.badgeText").withStyle(textColor);
+		}
+		
 		boolean constrainToRect = false;
 
 		if (showBadge)
@@ -122,7 +137,7 @@ public class ComparisonTooltips
 			return false;
 		}
 		
-		if (minecraft.player.containerMenu.getCarried().isEmpty() && !itemStack.isEmpty() && !EquipmentCompareConfig.INSTANCE.blacklist.get().contains(itemStack.getItem().getRegistryName().toString()))
+		if (minecraft.player.containerMenu.getCarried().isEmpty() && !itemStack.isEmpty() && !EquipmentCompareConfig.INSTANCE.blacklist.get().contains(ForgeRegistries.ITEMS.getKey(itemStack.getItem()).toString()))
 		{
 			// If this is a piece of equipment and we are already wearing the same type, display an additional tooltip as well.
 			EquipmentSlot slot = Mob.getEquipmentSlotForItem(itemStack);
@@ -163,11 +178,11 @@ public class ComparisonTooltips
 			{
 				try
 				{
-					equippedItems.addAll((List<ItemStack>) Class.forName("com.anthonyhilyard.equipmentcompare.CuriosHandler").getMethod("getCuriosMatchingSlot", LivingEntity.class, ItemStack.class).invoke(null, minecraft.player, itemStack));
+					equippedItems.addAll((List<ItemStack>) Class.forName("com.anthonyhilyard.equipmentcompare.compat.CuriosHandler").getMethod("getCuriosMatchingSlot", LivingEntity.class, ItemStack.class).invoke(null, minecraft.player, itemStack));
 				}
 				catch (Exception e)
 				{
-					EquipmentCompare.LOGGER.error(e);
+					Loader.LOGGER.error(ExceptionUtils.getStackTrace(e));
 				}
 			}
 
@@ -176,16 +191,16 @@ public class ComparisonTooltips
 			{
 				try
 				{
-					equippedItems.addAll((List<ItemStack>) Class.forName("com.anthonyhilyard.equipmentcompare.BaublesHandler").getMethod("getBaublesMatchingSlot", Player.class, ItemStack.class).invoke(null, minecraft.player, itemStack));
+					equippedItems.addAll((List<ItemStack>) Class.forName("com.anthonyhilyard.equipmentcompare.compat.BaublesHandler").getMethod("getBaublesMatchingSlot", Player.class, ItemStack.class).invoke(null, minecraft.player, itemStack));
 				}
 				catch (Exception e)
 				{
-					EquipmentCompare.LOGGER.error(e);
+					Loader.LOGGER.error(ExceptionUtils.getStackTrace(e));
 				}
 			}
 
 			// Filter blacklisted items.
-			equippedItems.removeIf(stack -> EquipmentCompareConfig.INSTANCE.blacklist.get().contains(stack.getItem().getRegistryName().toString()));
+			equippedItems.removeIf(stack -> EquipmentCompareConfig.INSTANCE.blacklist.get().contains(ForgeRegistries.ITEMS.getKey(stack.getItem()).toString()));
 
 			// Make sure we don't compare an item to itself (can happen with Curios slots).
 			equippedItems.remove(itemStack);
@@ -211,7 +226,7 @@ public class ComparisonTooltips
 					}
 					catch (Exception e)
 					{
-						EquipmentCompare.LOGGER.error(e);
+						Loader.LOGGER.error(ExceptionUtils.getStackTrace(e));
 					}
 				}
 
@@ -245,7 +260,7 @@ public class ComparisonTooltips
 
 					List<ClientTooltipComponent> equippedTooltipLines = Tooltips.gatherTooltipComponents(thisItem, screen.getTooltipFromItem(thisItem), thisItem.getTooltipImage(), x - previousRect.getWidth() - 14, screen.width, screen.height, itemFont, font, maxWidth, tooltipIndex++);
 					Rect2i equippedRect = Tooltips.calculateRect(itemStack, poseStack, equippedTooltipLines, x - previousRect.getWidth() - 14, y, screen.width, screen.height, maxWidth, itemFont, enforceMinimumWidth ? 48 : 0, centeredTitle);
-					MutableComponent equippedBadge = new TextComponent(EquipmentCompareConfig.INSTANCE.badgeText.get());
+					MutableComponent equippedBadge = Component.literal(EquipmentCompareConfig.INSTANCE.badgeText.get());
 					
 					// Fix equippedRect x coordinate.
 					int tooltipWidth = equippedRect.getWidth();

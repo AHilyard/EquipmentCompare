@@ -23,6 +23,7 @@ mixin {
 
 minecraft {
 	mappings channel: 'official', version: project.mcVersion
+	accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
 	runs {
 		client {
@@ -46,21 +47,13 @@ repositories {
 	}
 }
 
-sourceSets {
-	main {
-		resources {
-			srcDir 'src/generated/resources'
-		}
-	}
-}
-
 dependencies {
 	minecraft "net.minecraftforge:forge:${project.mcVersion}-${project.forgeVersion}"
 	annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
-	implementation fg.deobf("curse.maven:iceberg-520110:3586154")
-	compileClasspath fg.deobf('curse.maven:legendarytooltips-532127:3586193')
-	compileClasspath fg.deobf('curse.maven:curios-309927:3551144')
+	implementation fg.deobf("curse.maven:iceberg-520110:3832980")
+	compileClasspath fg.deobf('curse.maven:legendarytooltips-532127:3832989')
+	compileClasspath fg.deobf('curse.maven:curios-309927:3825806')
 	compileClasspath fg.deobf('curse.maven:baubles-366844:3545502')
 }
 
@@ -68,7 +61,7 @@ jar {
 	manifest {
 		attributes(["Specification-Title": project.name,
 					"Specification-Vendor": project.author,
-					"Specification-Version": "24.0",
+					"Specification-Version": project.version,
 					"Implementation-Title": project.name,
 					"Implementation-Version": project.version,
 					"Implementation-Vendor" : project.author,

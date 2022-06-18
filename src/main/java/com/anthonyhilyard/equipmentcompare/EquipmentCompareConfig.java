@@ -26,6 +26,7 @@ public class EquipmentCompareConfig
 	public final LongValue badgeBackgroundColor;
 	public final LongValue badgeBorderStartColor;
 	public final LongValue badgeBorderEndColor;
+	public final BooleanValue overrideBadgeText;
 	public final ConfigValue<String> badgeText;
 	public final LongValue badgeTextColor;
 	public final ConfigValue<List<? extends String>> blacklist;
@@ -42,6 +43,7 @@ public class EquipmentCompareConfig
 	{
 		build.comment("Client Configuration").push("client").push("visual_options");
 
+		overrideBadgeText = build.comment(" If badge_text should override the built-in translatable text.").define("override_badge_text", false);
 		badgeText = build.comment(" The text shown on the badge above equipped tooltips.").define("badge_text", "Equipped");
 		badgeTextColor = build.comment(" The color of the text shown on the badge above equipped tooltips.").defineInRange("badge_text_color", 0xFFFFFFFFL, 0x00000000L, 0xFFFFFFFFL);
 		badgeBackgroundColor = build.comment(" The background color of the \"equipped\" badge.").defineInRange("badge_bg", 0xF0101000L, 0x00000000L, 0xFFFFFFFFL);
@@ -60,10 +62,6 @@ public class EquipmentCompareConfig
 	@SubscribeEvent
 	public static void onLoad(IConfigEvent e)
 	{
-		if (e.getConfig().getModId().equals(Loader.MODID))
-		{
-			Loader.LOGGER.info("Equipment Compare config reloaded.");
-		}
 	}
 
 }

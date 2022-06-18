@@ -1,4 +1,4 @@
-package com.anthonyhilyard.equipmentcompare;
+package com.anthonyhilyard.equipmentcompare.compat;
 
 import java.util.ArrayList;
 import java.util.Arrays;

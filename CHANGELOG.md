@@ -1,5 +1,13 @@
 # Changelog
 
+### 1.3.0
+- Improved compatibility with other mods.  REI and similar are now supported for comparisons.
+- You can now compare from anvils, crafting tables, and most other menus.
+- Badge text and keybinding name are now translatable strings.
+- Added a configuration option for overriding the translatable badge text. (This defaults to false.)
+- Changed invalid update check url.
+- First version for Forge 1.19.
+
 ### 1.2.12
 - Fixed a bug that caused Forge servers to indicate an invalid modlist when installed.
 
