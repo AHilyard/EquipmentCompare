@@ -1,4 +1,4 @@
-package com.anthonyhilyard.equipmentcompare;
+package com.anthonyhilyard.equipmentcompare.compat;
 
 import com.anthonyhilyard.legendarytooltips.LegendaryTooltipsConfig;
 

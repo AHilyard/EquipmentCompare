@@ -37,7 +37,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.locale.Language;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 
 public class ComparisonTooltips
@@ -48,12 +48,22 @@ public class ComparisonTooltips
 
 	private static void drawTooltip(PoseStack poseStack, ItemStack itemStack, Rect2i rect, List<ClientTooltipComponent> tooltipLines, Font font, Screen screen, int maxWidth, boolean showBadge, boolean centeredTitle, int index)
 	{
-		int bgColor = (int)EquipmentCompareConfig.INSTANCE.badgeBackgroundColor;
-		int borderStartColor = (int)EquipmentCompareConfig.INSTANCE.badgeBorderStartColor;
-		int borderEndColor = (int)EquipmentCompareConfig.INSTANCE.badgeBorderEndColor;
+		int bgColor = EquipmentCompareConfig.INSTANCE.badgeBackgroundColor.get().intValue();
+		int borderStartColor = EquipmentCompareConfig.INSTANCE.badgeBorderStartColor.get().intValue();
+		int borderEndColor = EquipmentCompareConfig.INSTANCE.badgeBorderEndColor.get().intValue();
 
-		Style textColor = Style.EMPTY.withColor(TextColor.fromRgb((int)EquipmentCompareConfig.INSTANCE.badgeTextColor));
-		MutableComponent equippedBadge = new TextComponent(EquipmentCompareConfig.INSTANCE.badgeText).withStyle(textColor);
+		Style textColor = Style.EMPTY.withColor(TextColor.fromRgb(EquipmentCompareConfig.INSTANCE.badgeTextColor.get().intValue()));
+
+		MutableComponent equippedBadge;
+		if (EquipmentCompareConfig.INSTANCE.overrideBadgeText.get())
+		{
+			equippedBadge = Component.literal(EquipmentCompareConfig.INSTANCE.badgeText.get()).withStyle(textColor);
+		}
+		else
+		{
+			equippedBadge = Component.translatable("equipmentcompare.general.badgeText").withStyle(textColor);
+		}
+
 		boolean constrainToRect = false;
 
 		if (showBadge)
@@ -129,7 +139,7 @@ public class ComparisonTooltips
 			return false;
 		}
 
-		if (minecraft.player.containerMenu.getCarried().isEmpty() && !itemStack.isEmpty() && !EquipmentCompareConfig.INSTANCE.blacklist.contains(Registry.ITEM.getKey(itemStack.getItem()).toString()))
+		if (minecraft.player.containerMenu.getCarried().isEmpty() && !itemStack.isEmpty() && !EquipmentCompareConfig.INSTANCE.blacklist.get().contains(Registry.ITEM.getKey(itemStack.getItem()).toString()))
 		{
 			// If this is a piece of equipment and we are already wearing the same type, display an additional tooltip as well.
 			EquipmentSlot slot = Mob.getEquipmentSlotForItem(itemStack);
@@ -149,7 +159,7 @@ public class ComparisonTooltips
 					checkItem = false;
 				}
 				// If strict comparisons are enabled, only compare items of the same type.
-				else if (EquipmentCompareConfig.INSTANCE.strict)
+				else if (EquipmentCompareConfig.INSTANCE.strict.get())
 				{
 					if (!itemStack.getItem().getClass().equals(equippedItem.getItem().getClass()))
 					{
@@ -170,7 +180,7 @@ public class ComparisonTooltips
 			{
 				try
 				{
-					equippedItems.addAll((List<ItemStack>) Class.forName("com.anthonyhilyard.equipmentcompare.TrinketsHandler").getMethod("getTrinketsMatchingSlot", LivingEntity.class, ItemStack.class).invoke(null, minecraft.player, itemStack));
+					equippedItems.addAll((List<ItemStack>) Class.forName("com.anthonyhilyard.equipmentcompare.compat.TrinketsHandler").getMethod("getTrinketsMatchingSlot", LivingEntity.class, ItemStack.class).invoke(null, minecraft.player, itemStack));
 				}
 				catch (Exception e)
 				{
@@ -179,12 +189,12 @@ public class ComparisonTooltips
 			}
 
 			// Filter blacklisted items.
-			equippedItems.removeIf(stack -> EquipmentCompareConfig.INSTANCE.blacklist.contains(Registry.ITEM.getKey(stack.getItem()).toString()));
+			equippedItems.removeIf(stack -> EquipmentCompareConfig.INSTANCE.blacklist.get().contains(Registry.ITEM.getKey(stack.getItem()).toString()));
 
-			// Make sure we don't compare an item to itself (can happen with Curios slots).
+			// Make sure we don't compare an item to itself (can happen with Trinkets slots).
 			equippedItems.remove(itemStack);
 
-			if (!equippedItems.isEmpty() && (EquipmentCompare.tooltipActive ^ EquipmentCompareConfig.INSTANCE.defaultOn))
+			if (!equippedItems.isEmpty() && (EquipmentCompare.tooltipActive ^ EquipmentCompareConfig.INSTANCE.defaultOn.get()))
 			{
 				int maxWidth = ((screen.width - (equippedItems.size() * 16)) / (equippedItems.size() + 1));
 
@@ -201,12 +211,12 @@ public class ComparisonTooltips
 				{
 					try
 					{
-						centeredTitle = (boolean)Class.forName("com.anthonyhilyard.equipmentcompare.LegendaryTooltipsHandler").getMethod("getCenteredTitle").invoke(null, new Object[]{});
-						enforceMinimumWidth = (boolean)Class.forName("com.anthonyhilyard.equipmentcompare.LegendaryTooltipsHandler").getMethod("getEnforceMinimumWidth").invoke(null, new Object[]{});
+						centeredTitle = (boolean)Class.forName("com.anthonyhilyard.equipmentcompare.compat.LegendaryTooltipsHandler").getMethod("getCenteredTitle").invoke(null, new Object[]{});
+						enforceMinimumWidth = (boolean)Class.forName("com.anthonyhilyard.equipmentcompare.compat.LegendaryTooltipsHandler").getMethod("getEnforceMinimumWidth").invoke(null, new Object[]{});
 					}
 					catch (Exception e)
 					{
-						Loader.LOGGER.error(e);
+						Loader.LOGGER.error(ExceptionUtils.getStackTrace(e));
 					}
 				}
 
@@ -240,7 +250,15 @@ public class ComparisonTooltips
 
 					List<ClientTooltipComponent> equippedTooltipLines = Tooltips.gatherTooltipComponents(thisItem, screen.getTooltipFromItem(thisItem), thisItem.getTooltipImage(), x - previousRect.getWidth() - 14, screen.width, screen.height, itemFont, font, maxWidth, tooltipIndex++);
 					Rect2i equippedRect = Tooltips.calculateRect(itemStack, poseStack, equippedTooltipLines, x - previousRect.getWidth() - 14, y, screen.width, screen.height, maxWidth, itemFont, enforceMinimumWidth ? 48 : 0, centeredTitle);
-					MutableComponent equippedBadge = new TextComponent(EquipmentCompareConfig.INSTANCE.badgeText);
+					MutableComponent equippedBadge;
+					if (EquipmentCompareConfig.INSTANCE.overrideBadgeText.get())
+					{
+						equippedBadge = Component.literal(EquipmentCompareConfig.INSTANCE.badgeText.get());
+					}
+					else
+					{
+						equippedBadge = Component.translatable("equipmentcompare.general.badgeText");
+					}
 					
 					// Fix equippedRect x coordinate.
 					int tooltipWidth = equippedRect.getWidth();

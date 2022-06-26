@@ -2,9 +2,12 @@
 	"required": true,
 	"package": "com.anthonyhilyard.equipmentcompare.mixin",
 	"compatibilityLevel": "JAVA_16",
+	"plugin": "com.anthonyhilyard.equipmentcompare.mixin.MixinConfig",
 	"client": [
+		"AnvilScreenMixin",
 		"ScreenMixin",
-		"KeyMappingMixin"
+		"KeyMappingMixin",
+		"RoughlyEnoughItemsScreenOverlayImplImplMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
