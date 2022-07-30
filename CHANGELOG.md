@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.3.1
+- Added support for Minecraft 1.19.1.
+- Added support for latest version of Forge.
+
 ### 1.3.0
 - Improved compatibility with other mods.  REI and similar are now supported for comparisons.
 - You can now compare from anvils, crafting tables, and most other menus.

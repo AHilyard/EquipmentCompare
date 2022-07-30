@@ -8,7 +8,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.IExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.config.ModConfig;
 
@@ -22,8 +21,7 @@ public class Loader
 	{
 		if (FMLEnvironment.dist == Dist.CLIENT)
 		{
-			EquipmentCompare mod = new EquipmentCompare();
-			FMLJavaModLoadingContext.get().getModEventBus().addListener(mod::onClientSetup);
+			new EquipmentCompare();
 			MinecraftForge.EVENT_BUS.register(EquipmentCompare.class);
 
 			ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, EquipmentCompareConfig.SPEC);

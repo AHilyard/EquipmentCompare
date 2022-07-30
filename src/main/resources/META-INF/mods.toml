@@ -15,7 +15,7 @@ description='''Adds additional tooltips when hovering over equipment for easy co
 [[dependencies.equipmentcompare]]
 	modId="forge"
 	mandatory=true
-	versionRange="[41,)"
+	versionRange="[41.1,)"
 	ordering="NONE"
 	side="BOTH"
 
@@ -29,7 +29,7 @@ description='''Adds additional tooltips when hovering over equipment for easy co
 [[dependencies.equipmentcompare]]
 	modId="iceberg"
 	mandatory=true
-	versionRange="[1.0.44,)"
+	versionRange="[1.0.46,)"
 	ordering="NONE"
 	side="BOTH"
 
