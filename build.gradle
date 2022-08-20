@@ -2,27 +2,28 @@ buildscript {
 	repositories {
 		maven { url = 'https://files.minecraftforge.net/maven' }
 		maven { url = "https://repo.spongepowered.org/maven" }
-		jcenter()
 		mavenCentral()
 	}
 	dependencies {
-		classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+		classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
 		classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
 	}
 }
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.spongepowered.mixin'
+apply plugin: 'eclipse'
 
-archivesBaseName = name + '-' + mcVersion
+archivesBaseName = project.name + '-' + project.mcVersion
 
-sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
+java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 
 mixin {
-	add sourceSets.main, "equipmentcompare.refmap.json"
+	add sourceSets.main, "${project.name.toLowerCase()}.refmap.json"
 }
 
 minecraft {
 	mappings channel: 'official', version: project.mcVersion
+	accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
 	runs {
 		client {
@@ -31,10 +32,6 @@ minecraft {
 			properties 'terminal.ansi': 'true'
 			workingDirectory project.file('run').canonicalPath
 			source sourceSets.main
-
-			arg "-mixin.debug=true"
-			arg "-mixin.checks.interfaces=true"
-			arg "-mixin.config=equipmentcompare.mixins.json"
 
 			mods {
 				equipmentcompare {
@@ -50,70 +47,27 @@ repositories {
 		name = "CurseMaven"
 		url "https://www.cursemaven.com"
 	}
-	maven {
-		// For fernflower
-		name = 'Sponge'
-		url = 'https://repo.spongepowered.org/maven'
-	}
-}
-
-// Process resources on build
-processResources {
-	// This will ensure that this task is redone when the versions change.
-	inputs.property 'version', project.version
-
-	// Replace stuff in mods.toml, nothing else
-	from(sourceSets.main.resources.srcDirs) {
-		include 'META-INF/mods.toml'
-
-		// Replace version
-		expand 'version':project.version
-	}
-
-	// Copy everything else except the mods.toml
-	from(sourceSets.main.resources.srcDirs) {
-		exclude 'META-INF/mods.toml'
-	}
-}
-
-configurations {
-	provided
-}
-
-sourceSets {
-	main {
-		resources {
-			srcDir 'src/generated/resources'
-		}
-		compileClasspath += configurations.provided
-	}
-	fernflower {
-		compileClasspath += main.output
-	}
 }
 
 dependencies {
-	minecraft 'net.minecraftforge:forge:' + project.properties.mcVersion + '-' + forgeVersion
-	annotationProcessor 'org.spongepowered:mixin:0.8:processor'
+	minecraft 'net.minecraftforge:forge:' + project.mcVersion + '-' + project.forgeVersion
+	annotationProcessor 'org.spongepowered:mixin:0.8.4:processor'
 
-	// Fernflower decompiler
-	compile 'org.jetbrains.java.decompiler:fernflower:sponge-SNAPSHOT'
-
-	compile 'curse.maven:iceberg-520110:3476658'
+	implementation fg.deobf('curse.maven:iceberg-520110:3943132')
+	compileClasspath fg.deobf('curse.maven:legendarytooltips-532127:3943137')
 	compileClasspath fg.deobf('curse.maven:curios-309927:3343065')
-	compileClasspath fg.deobf('curse.maven:baubles-366844:3179641')
-	compileClasspath 'curse.maven:legendarytooltips-532127:3481460'
+	compileClasspath fg.deobf('curse.maven:baubles-366844:3339230')
 }
 
 jar {
 	manifest {
-		attributes(["Specification-Title": project.name,
-					"Specification-Vendor": project.author,
-					"Specification-Version": "24.0",
-					"Implementation-Title": project.name,
-					"Implementation-Version": project.version,
-					"Implementation-Vendor" : project.author,
-					"Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-					"MixinConfigs": "equipmentcompare.mixins.json"],)
+		attributes(["Specification-Title":		project.name,
+					"Specification-Vendor":		project.author,
+					"Specification-Version":	project.version,
+					"Implementation-Title":		project.name,
+					"Implementation-Version":	project.version,
+					"Implementation-Vendor" :	project.author,
+					"Implementation-Timestamp":	new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+					"MixinConfigs":				"${project.name.toLowerCase()}.mixins.json"],)
 	}
 }

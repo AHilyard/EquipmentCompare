@@ -1,4 +1,4 @@
-package com.anthonyhilyard.equipmentcompare;
+package com.anthonyhilyard.equipmentcompare.compat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.lazy.baubles.api.BaublesAPI;
-import com.lazy.baubles.api.bauble.IBauble;
-import com.lazy.baubles.api.cap.IBaublesItemHandler;
-import com.lazy.baubles.api.cap.BaublesCapabilities;
+import lazy.baubles.api.BaublesAPI;
+import lazy.baubles.api.bauble.IBauble;
+import lazy.baubles.api.cap.IBaublesItemHandler;
+import lazy.baubles.api.cap.BaublesCapabilities;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.LazyOptional;

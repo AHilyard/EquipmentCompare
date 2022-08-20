@@ -8,17 +8,13 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
 
 
 public class EquipmentCompare
 {
-	@SuppressWarnings("unused")
-	public static final Logger LOGGER = LogManager.getLogger();
 	public static boolean tooltipActive = false;
-	private static final KeyBinding showComparisonTooltip = new KeyBinding("Show comparison tooltip", KeyConflictContext.GUI, InputMappings.Type.KEYSYM.getOrCreate(GLFW.GLFW_KEY_LEFT_SHIFT), "key.categories.inventory");
+	private static final KeyBinding showComparisonTooltip = new KeyBinding("equipmentcompare.key.showTooltips", KeyConflictContext.GUI, InputMappings.Type.KEYSYM.getOrCreate(GLFW.GLFW_KEY_LEFT_SHIFT), "key.categories.inventory");
 
 	public void onClientSetup(FMLClientSetupEvent event)
 	{
