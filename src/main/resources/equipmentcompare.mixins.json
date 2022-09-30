@@ -4,11 +4,13 @@
 	"compatibilityLevel": "JAVA_8",
 	"refmap": "equipmentcompare.refmap.json",
 	"client": [
-		"ScreenMixin"
+		"GuiScreenMixin",
+		"GuiRepairMixin",
+		"GuiUtilsMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
 	},
-	"minVersion": "0.8.4",
+	"minVersion": "0.7.11",
 	"target": "@env(DEFAULT)"
 }

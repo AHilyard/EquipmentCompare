@@ -1,0 +1,14 @@
+[
+	{
+		"name": "Equipment Compare",
+		"modid": "equipmentcompare",
+		"description": "Adds additional tooltips when hovering over equipment for easy comparisons.",
+		"version": "${version}",
+		"mcversion": "${mcVersion}",
+		"url": "https://anthonyhilyard.com/",
+		"updateUrl": "https://mc-update-check.anthonyhilyard.com/502561",
+		"authorList": ["Grend"],
+		"logoFile": "icon.png",
+		"dependencies": []
+	}
+]

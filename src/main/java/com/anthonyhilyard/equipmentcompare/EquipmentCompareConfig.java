@@ -1,67 +1,83 @@
 package com.anthonyhilyard.equipmentcompare;
 
-import java.util.ArrayList;
+import java.io.File;
+import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
-import com.electronwill.nightconfig.core.Config;
+import net.minecraftforge.common.config.Config;
+import net.minecraftforge.common.config.ConfigCategory;
+import net.minecraftforge.common.config.ConfigManager;
+import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 
-import org.apache.commons.lang3.tuple.Pair;
-
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
-import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
-import net.minecraftforge.common.ForgeConfigSpec.LongValue;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.config.ModConfig;
-
-public class EquipmentCompareConfig
+@EventBusSubscriber(modid = EquipmentCompare.MODID)
+public class EquipmentCompareConfig extends Configuration
 {
-	public static final ForgeConfigSpec SPEC;
-	public static final EquipmentCompareConfig INSTANCE;
+	public static EquipmentCompareConfig INSTANCE;
 
-	public final BooleanValue defaultOn;
-	public final BooleanValue strict;
-	public final LongValue badgeBackgroundColor;
-	public final LongValue badgeBorderStartColor;
-	public final LongValue badgeBorderEndColor;
-	public final BooleanValue overrideBadgeText;
-	public final ConfigValue<String> badgeText;
-	public final LongValue badgeTextColor;
-	public final ConfigValue<List<? extends String>> blacklist;
+	public boolean defaultOn;
+	public boolean strict;
+	public String badgeBackgroundColor;
+	public String badgeBorderStartColor;
+	public String badgeBorderEndColor;
+	public boolean overrideBadgeText;
+	public String badgeText;
+	public String badgeTextColor;
+	public List<String> blacklist;
 
-	static
+	public static void loadConfig(File file)
 	{
-		Config.setInsertionOrderPreserved(true);
-		Pair<EquipmentCompareConfig, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(EquipmentCompareConfig::new);
-		SPEC = specPair.getRight();
-		INSTANCE = specPair.getLeft();
+		INSTANCE = new EquipmentCompareConfig(file);
 	}
 
-	public EquipmentCompareConfig(ForgeConfigSpec.Builder build)
+	private EquipmentCompareConfig(File file)
 	{
-		build.comment("Client Configuration").push("client").push("visual_options");
+		super(file);
+		load();
 
-		overrideBadgeText = build.comment(" If badge_text should override the built-in translatable text.").define("override_badge_text", false);
-		badgeText = build.comment(" The text shown on the badge above equipped tooltips.").define("badge_text", "Equipped");
-		badgeTextColor = build.comment(" The color of the text shown on the badge above equipped tooltips.").defineInRange("badge_text_color", 0xFFFFFFFFL, 0x00000000L, 0xFFFFFFFFL);
-		badgeBackgroundColor = build.comment(" The background color of the \"equipped\" badge.").defineInRange("badge_bg", 0xF0101000L, 0x00000000L, 0xFFFFFFFFL);
-		badgeBorderStartColor = build.comment(" The start border color of the \"equipped\" badge.").defineInRange("badge_border_start", 0xD0AA9113L, 0x00000000L, 0xFFFFFFFFL);
-		badgeBorderEndColor = build.comment(" The end border color of the \"equipped\" badge.").defineInRange("badge_border_end", 0x60C2850AL, 0x00000000L, 0xFFFFFFFFL);
+		// Update the data type of the categories collection so it maintains the proper order.
+		try
+		{
+			Field categoriesField = Configuration.class.getDeclaredField("categories");
+			categoriesField.setAccessible(true);
+			Map<String, ConfigCategory> categories = new LinkedHashMap<>();
 
-		build.pop().push("control_options");
+			// Get or create all the categories in the proper order by getting them here.
+			categories.put("visual_options", getCategory("visual_options"));
+			categories.put("control_options", getCategory("definitions"));
 
-		defaultOn = build.comment(" If the comparison tooltip should show by default (pressing bound key hides).").define("default_on", false);
-		strict = build.comment(" If tool comparisons should compare only the same types of tools (can't compare a sword to an axe, for example).").define("strict", false);
-		blacklist = build.comment(" Blacklist of items to show comparisons for.  Add item IDs to prevent them from being compared when hovered over or equipped.").defineListAllowEmpty(Arrays.asList("blacklist"), () -> new ArrayList<String>(), e -> ResourceLocation.isValidResourceLocation((String)e) );
+			categoriesField.set(this, categories);
+		}
+		catch (Exception e)
+		{
+			EquipmentCompare.LOGGER.error(e);
+		}
 
-		build.pop().pop();
+		overrideBadgeText = getBoolean("override_badge_text", "visual_options", false, "If badge_text should override the built-in translatable text.");
+		badgeText = getString("badge_text", "visual_options", "Equipped", "The text shown on the badge above equipped tooltips.");
+		badgeTextColor = getString("badge_text_color", "visual_options", "#FFFFFFFF", "The color of the text shown on the badge above equipped tooltips.");
+		badgeBackgroundColor = getString("badge_bg", "visual_options", "#F0101000", "The background color of the \"equipped\" badge.");
+		badgeBorderStartColor = getString("badge_border_start", "visual_options", "#D0AA9113", "The start color of the border of the \"equipped\" badge.");
+		badgeBorderEndColor = getString("badge_border_end", "visual_options", "#60C2850A", "The end color of the border of the \"equipped\" badge.");
+		
+		defaultOn = getBoolean("default_on", "control_options", false, "If the comparison tooltip should show by default (pressing bound key hides).");
+		strict = getBoolean("strict", "control_options", false, "If held item comparisons should compare only the same types of items (can't compare a sword to an axe, for example).");
+		blacklist = Arrays.asList(getStringList("blacklist", "control_options", new String[]{}, "Blacklist of items to show comparisons for.  Add item IDs to prevent them from being compared when hovered over or equipped."));
+
+		save();
 	}
 
 	@SubscribeEvent
-	public static void onLoad(ModConfig.Loading e)
+	public static void onLoad(final ConfigChangedEvent.OnConfigChangedEvent event)
 	{
+		if (event.getModID().equals(EquipmentCompare.MODID))
+		{
+			ConfigManager.sync(EquipmentCompare.MODID, Config.Type.INSTANCE);
+		}
 	}
-
 }
