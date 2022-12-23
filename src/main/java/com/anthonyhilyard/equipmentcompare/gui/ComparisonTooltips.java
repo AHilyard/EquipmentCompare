@@ -27,9 +27,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import com.mojang.math.Matrix4f;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.joml.Matrix4f;
 
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.network.chat.MutableComponent;
@@ -45,6 +45,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public class ComparisonTooltips
 {
+	@SuppressWarnings("null")
 	private static void drawTooltip(PoseStack poseStack, ItemStack itemStack, Rect2i rect, List<ClientTooltipComponent> tooltipLines, Font font, Screen screen, int maxWidth, boolean showBadge, boolean centeredTitle, int index)
 	{
 		int bgColor = (int)EquipmentCompareConfig.INSTANCE.badgeBackgroundColor.get().longValue();
@@ -121,7 +122,7 @@ public class ComparisonTooltips
 			poseStack.popPose();
 		}
 
-		Tooltips.renderItemTooltip(itemStack, poseStack, new Tooltips.TooltipInfo(tooltipLines, font), rect, screen.width, screen.height, ScreenUtils.DEFAULT_BACKGROUND_COLOR, ScreenUtils.DEFAULT_BACKGROUND_COLOR, ScreenUtils.DEFAULT_BORDER_COLOR_START, ScreenUtils.DEFAULT_BORDER_COLOR_END, showBadge, constrainToRect, centeredTitle, index);
+		Tooltips.renderItemTooltip(itemStack, poseStack, new Tooltips.TooltipInfo(tooltipLines, font, Tooltips.calculateTitleLines(tooltipLines)), rect, screen.width, screen.height, ScreenUtils.DEFAULT_BACKGROUND_COLOR, ScreenUtils.DEFAULT_BACKGROUND_COLOR, ScreenUtils.DEFAULT_BORDER_COLOR_START, ScreenUtils.DEFAULT_BORDER_COLOR_END, showBadge, constrainToRect, centeredTitle, index);
 	}
 
 	public static boolean render(PoseStack poseStack, int x, int y, Slot hoveredSlot, Minecraft minecraft, Font font, Screen screen)
@@ -130,7 +131,7 @@ public class ComparisonTooltips
 		return render(poseStack, x, y, itemStack, minecraft, font, screen);
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "null"})
 	public static boolean render(PoseStack poseStack, int x, int y, ItemStack itemStack, Minecraft minecraft, Font font, Screen screen)
 	{
 		// The screen must be valid to render tooltips.
@@ -223,8 +224,8 @@ public class ComparisonTooltips
 				{
 					try
 					{
-						centeredTitle = (boolean)Class.forName("com.anthonyhilyard.equipmentcompare.LegendaryTooltipsHandler").getMethod("getCenteredTitle").invoke(null, new Object[]{});
-						enforceMinimumWidth = (boolean)Class.forName("com.anthonyhilyard.equipmentcompare.LegendaryTooltipsHandler").getMethod("getEnforceMinimumWidth").invoke(null, new Object[]{});
+						centeredTitle = (boolean)Class.forName("com.anthonyhilyard.equipmentcompare.compat.LegendaryTooltipsHandler").getMethod("getCenteredTitle").invoke(null, new Object[]{});
+						enforceMinimumWidth = (boolean)Class.forName("com.anthonyhilyard.equipmentcompare.compat.LegendaryTooltipsHandler").getMethod("getEnforceMinimumWidth").invoke(null, new Object[]{});
 					}
 					catch (Exception e)
 					{

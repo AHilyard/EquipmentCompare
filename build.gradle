@@ -13,7 +13,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'eclipse'
 
-archivesBaseName = project.name + '-' + project.mcVersion
+archivesBaseName = project.name + '-' + project.mcVersion + '-forge'
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
@@ -51,8 +51,8 @@ dependencies {
 	minecraft "net.minecraftforge:forge:${project.mcVersion}-${project.forgeVersion}"
 	annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
-	implementation fg.deobf("curse.maven:iceberg-520110:3898603")
-	compileClasspath fg.deobf('curse.maven:legendarytooltips-532127:3832989')
+	implementation fg.deobf("curse.maven:iceberg-520110:4248148")
+	compileClasspath fg.deobf('curse.maven:legendarytooltips-532127:4238818')
 	compileClasspath fg.deobf('curse.maven:curios-309927:3825806')
 	compileClasspath fg.deobf('curse.maven:baubles-366844:3545502')
 }

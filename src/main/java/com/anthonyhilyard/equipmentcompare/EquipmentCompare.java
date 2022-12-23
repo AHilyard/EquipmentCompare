@@ -1,15 +1,16 @@
 package com.anthonyhilyard.equipmentcompare;
 
 import net.minecraft.client.KeyMapping;
+
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
+import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.client.event.ScreenEvent.KeyPressed;
 import net.minecraftforge.client.event.ScreenEvent.KeyReleased;
 import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import org.lwjgl.glfw.GLFW;
-
 
 public class EquipmentCompare
 {
@@ -38,5 +39,11 @@ public class EquipmentCompare
 		{
 			tooltipActive = false;
 		}
+	}
+
+	@SubscribeEvent
+	public static void onScreenClosing(ScreenEvent.Closing event)
+	{
+		tooltipActive = false;
 	}
 }

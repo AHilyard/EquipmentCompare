@@ -1,6 +1,6 @@
-package com.anthonyhilyard.equipmentcompare;
+package com.anthonyhilyard.equipmentcompare.compat;
 
-import com.anthonyhilyard.legendarytooltips.LegendaryTooltipsConfig;
+import com.anthonyhilyard.legendarytooltips.config.LegendaryTooltipsConfig;
 
 public class LegendaryTooltipsHandler
 {
