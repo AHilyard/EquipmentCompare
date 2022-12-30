@@ -12,6 +12,8 @@ import com.anthonyhilyard.iceberg.events.RenderTooltipExtEvent;
 import com.anthonyhilyard.iceberg.util.GuiHelper;
 import com.anthonyhilyard.iceberg.util.Tooltips;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.math.Matrix4f;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -20,7 +22,6 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.Rect2i;
-import com.mojang.blaze3d.vertex.Tesselator;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
@@ -29,7 +30,6 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.joml.Matrix4f;
 
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.network.chat.MutableComponent;

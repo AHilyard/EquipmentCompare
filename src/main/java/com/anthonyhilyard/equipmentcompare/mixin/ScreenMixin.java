@@ -18,7 +18,6 @@ import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.world.item.ItemStack;
 
 @Mixin(Screen.class)
@@ -61,7 +60,7 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler
 	}
 
 	@Inject(method = "renderTooltipInternal", at = @At(value  = "HEAD"), cancellable = true)
-	public void renderTooltipInternal(PoseStack poseStack, List<ClientTooltipComponent> components, int x, int y, ClientTooltipPositioner positioner, CallbackInfo info)
+	public void renderTooltipInternal(PoseStack poseStack, List<ClientTooltipComponent> components, int x, int y, CallbackInfo info)
 	{
 		if (!tooltipsDisplayed && tooltipStack != ItemStack.EMPTY)
 		{
