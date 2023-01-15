@@ -9,7 +9,8 @@ import org.lwjgl.glfw.GLFW;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 
-import net.minecraftforge.api.ModLoadingContext;
+import fuzs.forgeconfigapiport.api.config.v2.ForgeConfigRegistry;
+
 import net.minecraftforge.fml.config.ModConfig;
 
 public class EquipmentCompare implements ClientModInitializer
@@ -21,6 +22,6 @@ public class EquipmentCompare implements ClientModInitializer
 	@Override
 	public void onInitializeClient()
 	{
-		ModLoadingContext.registerConfig(Loader.MODID, ModConfig.Type.COMMON, EquipmentCompareConfig.SPEC);
+		ForgeConfigRegistry.INSTANCE.register(Loader.MODID, ModConfig.Type.COMMON, EquipmentCompareConfig.SPEC);
 	}
 }

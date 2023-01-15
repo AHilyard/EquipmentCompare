@@ -22,7 +22,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.client.renderer.Rect2i;
 import com.mojang.blaze3d.vertex.Tesselator;
 import net.minecraft.world.entity.LivingEntity;
@@ -30,9 +30,9 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import com.mojang.math.Matrix4f;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.joml.Matrix4f;
 
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.network.chat.MutableComponent;
@@ -46,6 +46,7 @@ public class ComparisonTooltips
 	private static final int DEFAULT_BORDER_COLOR_START = 0x505000FF;
 	private static final int DEFAULT_BORDER_COLOR_END = 0x5028007F;
 
+	@SuppressWarnings("null")
 	private static void drawTooltip(PoseStack poseStack, ItemStack itemStack, Rect2i rect, List<ClientTooltipComponent> tooltipLines, Font font, Screen screen, int maxWidth, boolean showBadge, boolean centeredTitle, int index)
 	{
 		int bgColor = EquipmentCompareConfig.INSTANCE.badgeBackgroundColor.get().intValue();
@@ -121,7 +122,7 @@ public class ComparisonTooltips
 			poseStack.popPose();
 		}
 
-		Tooltips.renderItemTooltip(itemStack, poseStack, new Tooltips.TooltipInfo(tooltipLines, font), rect, screen.width, screen.height, DEFAULT_BACKGROUND_COLOR, DEFAULT_BACKGROUND_COLOR, DEFAULT_BORDER_COLOR_START, DEFAULT_BORDER_COLOR_END, showBadge, constrainToRect, centeredTitle, index);
+		Tooltips.renderItemTooltip(itemStack, poseStack, new Tooltips.TooltipInfo(tooltipLines, font, Tooltips.calculateTitleLines(tooltipLines)), rect, screen.width, screen.height, DEFAULT_BACKGROUND_COLOR, DEFAULT_BACKGROUND_COLOR, DEFAULT_BORDER_COLOR_START, DEFAULT_BORDER_COLOR_END, showBadge, constrainToRect, centeredTitle, index);
 	}
 
 	public static boolean render(PoseStack poseStack, int x, int y, Slot hoveredSlot, Minecraft minecraft, Font font, Screen screen)
@@ -130,7 +131,7 @@ public class ComparisonTooltips
 		return render(poseStack, x, y, itemStack, minecraft, font, screen);
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "null"})
 	public static boolean render(PoseStack poseStack, int x, int y, ItemStack itemStack, Minecraft minecraft, Font font, Screen screen)
 	{
 		// The screen must be valid to render tooltips.
@@ -139,7 +140,7 @@ public class ComparisonTooltips
 			return false;
 		}
 
-		if (minecraft.player.containerMenu.getCarried().isEmpty() && !itemStack.isEmpty() && !EquipmentCompareConfig.INSTANCE.blacklist.get().contains(Registry.ITEM.getKey(itemStack.getItem()).toString()))
+		if (minecraft.player.containerMenu.getCarried().isEmpty() && !itemStack.isEmpty() && !EquipmentCompareConfig.INSTANCE.blacklist.get().contains(BuiltInRegistries.ITEM.getKey(itemStack.getItem()).toString()))
 		{
 			// If this is a piece of equipment and we are already wearing the same type, display an additional tooltip as well.
 			EquipmentSlot slot = Mob.getEquipmentSlotForItem(itemStack);
@@ -189,7 +190,7 @@ public class ComparisonTooltips
 			}
 
 			// Filter blacklisted items.
-			equippedItems.removeIf(stack -> EquipmentCompareConfig.INSTANCE.blacklist.get().contains(Registry.ITEM.getKey(stack.getItem()).toString()));
+			equippedItems.removeIf(stack -> EquipmentCompareConfig.INSTANCE.blacklist.get().contains(BuiltInRegistries.ITEM.getKey(stack.getItem()).toString()));
 
 			// Make sure we don't compare an item to itself (can happen with Trinkets slots).
 			equippedItems.remove(itemStack);

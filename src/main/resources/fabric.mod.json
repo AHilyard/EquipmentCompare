@@ -33,12 +33,12 @@
 		"fabric": "*",
 		"minecraft": "~1.19",
 		"java": ">=17",
-		"forgeconfigapiport": ">=4.0",
-		"iceberg": ">=1.0.38"
+		"forgeconfigapiport": ">=5.0",
+		"iceberg": ">=1.1.0"
 	},
 	"suggests": {
 		"trinkets": ">=3.4.0",
-		"legendarytooltips": ">=1.2.6"
+		"legendarytooltips": ">=1.4.0"
 	},
 	"custom": {
 		"modupdater": {
