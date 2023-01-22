@@ -241,6 +241,9 @@ public class Tooltips
 			return rect;
 		}
 
+		// Fire off a matching post event because some mods rely on both events being fired.
+		MinecraftForge.EVENT_BUS.post(new RenderTooltipExtEvent.PostText(ItemStack.EMPTY, new ArrayList<String>(), mouseX, mouseY, font, rect.getWidth(), rect.getHeight(), false, 0));
+
 		mouseX = event.getX();
 		mouseY = event.getY();
 		screenWidth = event.getScreenWidth();

@@ -6,19 +6,20 @@ import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
 
 import net.minecraft.client.settings.KeyBinding;
+
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
-
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
 
 
-@Mod(modid=EquipmentCompare.MODID, name=EquipmentCompare.MODNAME, version=EquipmentCompare.MODVERSION, acceptedMinecraftVersions = "[1.12.2]")
-@EventBusSubscriber(modid = EquipmentCompare.MODID)
+@Mod(modid=EquipmentCompare.MODID, name=EquipmentCompare.MODNAME, version=EquipmentCompare.MODVERSION, acceptedMinecraftVersions = "[1.12.2]", clientSideOnly = true)
+@EventBusSubscriber(modid = EquipmentCompare.MODID, value = Side.CLIENT)
 public class EquipmentCompare
 {
 	public static final String MODID = "equipmentcompare";

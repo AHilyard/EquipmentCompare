@@ -80,6 +80,8 @@ public class ComparisonTooltips
 			// If a supported version of legendary tooltips is installed, AND this item needs a custom border display the badge lower and without a border.
 			if (!UNSUPPORTED_LT_VERSIONS.contains(legendaryTooltipsVersion))
 			{
+				bgColor = 0xF0100010;
+
 				// Fire a color event to properly update the background color if needed.
 				RenderTooltipExtEvent.Color colorEvent = new RenderTooltipExtEvent.Color(itemStack, tooltipLines, rect.getX(), rect.getY(), font, bgColor, borderStartColor, borderEndColor, showBadge, index);
 				if (!MinecraftForge.EVENT_BUS.post(colorEvent))
@@ -91,8 +93,8 @@ public class ComparisonTooltips
 				badgeOffset = 6;
 
 				GuiUtils.drawGradientRect(-1, rect.getX() + 1,					 rect.getY() - 17 + badgeOffset, rect.getX() + rect.getWidth() + 7, rect.getY() - 16 + badgeOffset, bgColor, bgColor);
-				GuiUtils.drawGradientRect(-1, rect.getX(),						 rect.getY() - 16 + badgeOffset, rect.getX() + 1, 					rect.getY() - 4 + badgeOffset,  bgColor, bgColor);
-				GuiUtils.drawGradientRect(-1, rect.getX() + rect.getWidth() + 7, rect.getY() - 16 + badgeOffset, rect.getX() + rect.getWidth() + 8,	rect.getY() - 4 + badgeOffset,  bgColor, bgColor);
+				GuiUtils.drawGradientRect(-1, rect.getX(),						 rect.getY() - 16 + badgeOffset, rect.getX() + 1, 					rect.getY() - 5 + badgeOffset,  bgColor, bgColor);
+				GuiUtils.drawGradientRect(-1, rect.getX() + rect.getWidth() + 7, rect.getY() - 16 + badgeOffset, rect.getX() + rect.getWidth() + 8,	rect.getY() - 5 + badgeOffset,  bgColor, bgColor);
 				GuiUtils.drawGradientRect(-1, rect.getX() + 1,					 rect.getY() - 16 + badgeOffset, rect.getX() + rect.getWidth() + 7, rect.getY() - 6 + badgeOffset,  bgColor, bgColor);
 			}
 			else
@@ -134,7 +136,7 @@ public class ComparisonTooltips
 	public static boolean render(int x, int y, ItemStack itemStack, Minecraft minecraft, FontRenderer font, GuiScreen screen, List<String> customTooltipLines)
 	{
 		// The screen must be valid to render tooltips.
-		if (screen == null)
+		if (screen == null || minecraft == null || minecraft.player == null || minecraft.player.inventory == null || itemStack == null)
 		{
 			return false;
 		}
