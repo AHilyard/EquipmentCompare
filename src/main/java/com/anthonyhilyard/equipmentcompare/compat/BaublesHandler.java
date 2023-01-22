@@ -1,4 +1,4 @@
-package com.anthonyhilyard.equipmentcompare;
+package com.anthonyhilyard.equipmentcompare.compat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,6 +16,7 @@ import net.minecraftforge.common.util.LazyOptional;
 
 public class BaublesHandler
 {
+	@SuppressWarnings("null")
 	public static List<ItemStack> getBaublesMatchingSlot(Player player, ItemStack itemStack)
 	{
 		List<ItemStack> result = new ArrayList<ItemStack>();
