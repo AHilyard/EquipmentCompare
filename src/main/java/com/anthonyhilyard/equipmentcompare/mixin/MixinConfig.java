@@ -34,6 +34,7 @@ public class MixinConfig implements IMixinConfigPlugin
 		{
 			return loadingModList.stream().anyMatch(modContainer -> modContainer.getMetadata().getId().contentEquals("roughlyenoughitems"));
 		}
+
 		return true;
 	}
 

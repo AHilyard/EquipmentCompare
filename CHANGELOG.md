@@ -1,5 +1,31 @@
 # Changelog
 
+### 1.3.6
+- Added French localization.
+- Added item selector support to blacklist entries.
+
+### 1.3.5
+- Added a "maximum_comparisons" configuration option to limit the number of comparison tooltips onscreen at once.  Defaults to 3.
+- Fixed a tooltip alignment bug when multiple comparisons were active (such as with Curios).
+- Added Ukrainian localization.
+- Added Russian localization.
+- First Minecraft 1.19.4 release.
+
+### 1.3.4
+- Fixed intermittent crash when comparing items.
+- Fixed visual glitch in inventory caused by conflicts with some mods.
+- Fixed upper part of comparison tooltip being miscolored when "borders_match_rarity" is turned off and Legendary Tooltips is installed.
+- Fixed two misplaced pixels in comparison tooltips.
+- Added Portuguese localization.
+
+### 1.3.3
+- Fixed a bug that prevented certain modded tools from being compared.
+
+### 1.3.2
+- Added support for Minecraft 1.19.3.
+- Fixed a bug that caused the keybind to be missing from the controls screen.
+- Fixed a bug that caused the comparison tooltips key to stick under certain circumstances.
+
 ### 1.3.1
 - Fixed an alignment bug that could happen when using translated badge text.
 - First version for Fabric 1.19.

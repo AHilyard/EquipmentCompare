@@ -5,9 +5,9 @@
 	"plugin": "com.anthonyhilyard.equipmentcompare.mixin.MixinConfig",
 	"client": [
 		"AnvilScreenMixin",
-		"ScreenMixin",
 		"KeyMappingMixin",
-		"RoughlyEnoughItemsScreenOverlayImplImplMixin"
+		"RoughlyEnoughItemsScreenOverlayImplFabricMixin",
+		"ScreenMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

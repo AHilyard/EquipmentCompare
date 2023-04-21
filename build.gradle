@@ -33,18 +33,16 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${loaderVersion}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${fabricVersion}"
 
-	//modImplementation "curse.maven:iceberg-539382:3832794"
-	modImplementation files("libs/Iceberg-1.19.3-fabric-1.1.2.jar")
+	modImplementation "curse.maven:iceberg-539382:4499842"
 	modImplementation "fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${forgeConfigApiVersion}"
-	//modApi "curse.maven:legendarytooltips-542478:3843497"
-	modApi files("libs/LegendaryTooltips-1.19.3-fabric-1.4.1.jar")
+	modApi "curse.maven:legendarytooltips-542478:4494149"
 
 	// These are all needed for Trinkets.
 	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:${ccaVersion}")
 	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:${ccaVersion}")
-	modImplementation "curse.maven:trinkets-341284:3820928"
+	modImplementation "curse.maven:trinkets-341284:4441758"
 
-	modImplementation "curse.maven:roughlyenoughitems-310111:3846514"
+	modImplementation "curse.maven:roughlyenoughitems-310111:4440734"
 }
 
 loom {

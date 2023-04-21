@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.Map;
 
 import com.anthonyhilyard.equipmentcompare.EquipmentCompare;
-import com.anthonyhilyard.equipmentcompare.EquipmentCompareConfig;
-import com.anthonyhilyard.equipmentcompare.Loader;
+import com.anthonyhilyard.equipmentcompare.config.EquipmentCompareConfig;
 import com.anthonyhilyard.iceberg.events.RenderTooltipEvents;
 import com.anthonyhilyard.iceberg.events.RenderTooltipEvents.ColorExtResult;
 import com.anthonyhilyard.iceberg.util.GuiHelper;
 import com.anthonyhilyard.iceberg.util.Tooltips;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.Tesselator;
 
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.fabricmc.loader.api.FabricLoader;
@@ -22,9 +22,12 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.client.renderer.Rect2i;
-import com.mojang.blaze3d.vertex.Tesselator;
+import net.minecraft.locale.Language;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextColor;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -34,17 +37,25 @@ import net.minecraft.world.item.ItemStack;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.joml.Matrix4f;
 
-import net.minecraft.network.chat.TextColor;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.locale.Language;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.Style;
-
 public class ComparisonTooltips
 {
 	private static final int DEFAULT_BACKGROUND_COLOR = 0xF0100010;
 	private static final int DEFAULT_BORDER_COLOR_START = 0x505000FF;
 	private static final int DEFAULT_BORDER_COLOR_END = 0x5028007F;
+
+	private static MutableComponent getEquippedBadge()
+	{
+		MutableComponent equippedBadge;
+		if (EquipmentCompareConfig.INSTANCE.overrideBadgeText.get())
+		{
+			equippedBadge = Component.translatable(EquipmentCompareConfig.INSTANCE.badgeText.get());
+		}
+		else
+		{
+			equippedBadge = Component.translatable("equipmentcompare.general.badgeText");
+		}
+		return equippedBadge;
+	}
 
 	@SuppressWarnings("null")
 	private static void drawTooltip(PoseStack poseStack, ItemStack itemStack, Rect2i rect, List<ClientTooltipComponent> tooltipLines, Font font, Screen screen, int maxWidth, boolean showBadge, boolean centeredTitle, int index)
@@ -54,16 +65,7 @@ public class ComparisonTooltips
 		int borderEndColor = EquipmentCompareConfig.INSTANCE.badgeBorderEndColor.get().intValue();
 
 		Style textColor = Style.EMPTY.withColor(TextColor.fromRgb(EquipmentCompareConfig.INSTANCE.badgeTextColor.get().intValue()));
-
-		MutableComponent equippedBadge;
-		if (EquipmentCompareConfig.INSTANCE.overrideBadgeText.get())
-		{
-			equippedBadge = Component.literal(EquipmentCompareConfig.INSTANCE.badgeText.get()).withStyle(textColor);
-		}
-		else
-		{
-			equippedBadge = Component.translatable("equipmentcompare.general.badgeText").withStyle(textColor);
-		}
+		MutableComponent equippedBadge = getEquippedBadge().withStyle(textColor);
 
 		boolean constrainToRect = false;
 
@@ -86,22 +88,21 @@ public class ComparisonTooltips
 			// If legendary tooltips is installed, AND this item needs a custom border display the badge lower and without a border.
 			if (FabricLoader.getInstance().isModLoaded("legendarytooltips"))
 			{
+				bgColor = DEFAULT_BACKGROUND_COLOR;
+
 				// Fire a color event to properly update the background color if needed.
 				ColorExtResult colorResult = RenderTooltipEvents.COLOREXT.invoker().onColor(itemStack, tooltipLines, poseStack, rect.getX(), rect.getY(), font, bgColor, bgColor, borderStartColor, borderEndColor, showBadge, index);
 				if (colorResult != null)
 				{
 					bgColor = colorResult.backgroundStart();
 				}
-				else
-				{
-					bgColor = DEFAULT_BACKGROUND_COLOR;
-				}
+
 				constrainToRect = true;
 				badgeOffset = 6;
 				
 				GuiHelper.drawGradientRect(matrix, -1, rect.getX() + 1,						 rect.getY() - 17 + badgeOffset, rect.getX() + rect.getWidth() + 7, rect.getY() - 16 + badgeOffset, bgColor, bgColor);
-				GuiHelper.drawGradientRect(matrix, -1, rect.getX(),							 rect.getY() - 16 + badgeOffset, rect.getX() + 1, 					rect.getY() - 4 + badgeOffset,  bgColor, bgColor);
-				GuiHelper.drawGradientRect(matrix, -1, rect.getX() + rect.getWidth() + 7,	 rect.getY() - 16 + badgeOffset, rect.getX() + rect.getWidth() + 8,	rect.getY() - 4 + badgeOffset,  bgColor, bgColor);
+				GuiHelper.drawGradientRect(matrix, -1, rect.getX(),							 rect.getY() - 16 + badgeOffset, rect.getX() + 1, 					rect.getY() - 5 + badgeOffset,  bgColor, bgColor);
+				GuiHelper.drawGradientRect(matrix, -1, rect.getX() + rect.getWidth() + 7,	 rect.getY() - 16 + badgeOffset, rect.getX() + rect.getWidth() + 8,	rect.getY() - 5 + badgeOffset,  bgColor, bgColor);
 				GuiHelper.drawGradientRect(matrix, -1, rect.getX() + 1,						 rect.getY() - 16 + badgeOffset, rect.getX() + rect.getWidth() + 7, rect.getY() - 6 + badgeOffset,  bgColor, bgColor);
 			}
 			else
@@ -117,7 +118,7 @@ public class ComparisonTooltips
 				GuiHelper.drawGradientRect(matrix, -1, rect.getX() + 1,						 rect.getY() - 5 + badgeOffset,  rect.getX() + rect.getWidth() + 7, rect.getY() - 4 + badgeOffset,  borderEndColor,   borderEndColor);
 			}
 
-			font.drawInBatch(Language.getInstance().getVisualOrder(equippedBadge), (float)rect.getX() + (rect.getWidth() - font.width(equippedBadge)) / 2 + 4, (float)rect.getY() - 14 + badgeOffset, -1, true, poseStack.last().pose(), renderType, false, 0x000000, 0xF000F0);
+			font.drawInBatch(Language.getInstance().getVisualOrder(equippedBadge), (float)rect.getX() + (rect.getWidth() - font.width(equippedBadge)) / 2 + 4, (float)rect.getY() - 14 + badgeOffset, -1, true, poseStack.last().pose(), renderType, Font.DisplayMode.NORMAL, 0x000000, 0xF000F0);
 			renderType.endBatch();
 			poseStack.popPose();
 		}
@@ -135,12 +136,12 @@ public class ComparisonTooltips
 	public static boolean render(PoseStack poseStack, int x, int y, ItemStack itemStack, Minecraft minecraft, Font font, Screen screen)
 	{
 		// The screen must be valid to render tooltips.
-		if (screen == null)
+		if (screen == null || minecraft == null || minecraft.player == null || minecraft.player.containerMenu == null || itemStack == null)
 		{
 			return false;
 		}
 
-		if (minecraft.player.containerMenu.getCarried().isEmpty() && !itemStack.isEmpty() && !EquipmentCompareConfig.INSTANCE.blacklist.get().contains(BuiltInRegistries.ITEM.getKey(itemStack.getItem()).toString()))
+		if (minecraft.player.containerMenu.getCarried().isEmpty() && !itemStack.isEmpty() && !EquipmentCompareConfig.isItemBlacklisted(itemStack))
 		{
 			// If this is a piece of equipment and we are already wearing the same type, display an additional tooltip as well.
 			EquipmentSlot slot = Mob.getEquipmentSlotForItem(itemStack);
@@ -185,17 +186,29 @@ public class ComparisonTooltips
 				}
 				catch (Exception e)
 				{
-					Loader.LOGGER.error(ExceptionUtils.getStackTrace(e));
+					EquipmentCompare.LOGGER.error(ExceptionUtils.getStackTrace(e));
 				}
 			}
 
 			// Filter blacklisted items.
-			equippedItems.removeIf(stack -> EquipmentCompareConfig.INSTANCE.blacklist.get().contains(BuiltInRegistries.ITEM.getKey(stack.getItem()).toString()));
+			equippedItems.removeIf(stack -> EquipmentCompareConfig.isItemBlacklisted(stack));
 
 			// Make sure we don't compare an item to itself (can happen with Trinkets slots).
 			equippedItems.remove(itemStack);
 
-			if (!equippedItems.isEmpty() && (EquipmentCompare.tooltipActive ^ EquipmentCompareConfig.INSTANCE.defaultOn.get()))
+			// Now prune the list down to the maximum number of comparisons.
+			if (equippedItems.size() > EquipmentCompareConfig.INSTANCE.maxComparisons.get())
+			{
+				equippedItems = equippedItems.subList(0, EquipmentCompareConfig.INSTANCE.maxComparisons.get().intValue());
+			}
+
+			// Now prune the list down to the maximum number of comparisons.
+			if (equippedItems.size() > EquipmentCompareConfig.INSTANCE.maxComparisons.get())
+			{
+				equippedItems = equippedItems.subList(0, EquipmentCompareConfig.INSTANCE.maxComparisons.get().intValue());
+			}
+
+			if (!equippedItems.isEmpty() && (EquipmentCompare.comparisonsActive ^ EquipmentCompareConfig.INSTANCE.defaultOn.get()))
 			{
 				int maxWidth = ((screen.width - (equippedItems.size() * 16)) / (equippedItems.size() + 1));
 
@@ -217,7 +230,7 @@ public class ComparisonTooltips
 					}
 					catch (Exception e)
 					{
-						Loader.LOGGER.error(ExceptionUtils.getStackTrace(e));
+						EquipmentCompare.LOGGER.error(ExceptionUtils.getStackTrace(e));
 					}
 				}
 
@@ -251,15 +264,7 @@ public class ComparisonTooltips
 
 					List<ClientTooltipComponent> equippedTooltipLines = Tooltips.gatherTooltipComponents(thisItem, screen.getTooltipFromItem(thisItem), thisItem.getTooltipImage(), x - previousRect.getWidth() - 14, screen.width, screen.height, itemFont, font, maxWidth, tooltipIndex++);
 					Rect2i equippedRect = Tooltips.calculateRect(itemStack, poseStack, equippedTooltipLines, x - previousRect.getWidth() - 14, y, screen.width, screen.height, maxWidth, itemFont, enforceMinimumWidth ? 48 : 0, centeredTitle);
-					MutableComponent equippedBadge;
-					if (EquipmentCompareConfig.INSTANCE.overrideBadgeText.get())
-					{
-						equippedBadge = Component.literal(EquipmentCompareConfig.INSTANCE.badgeText.get());
-					}
-					else
-					{
-						equippedBadge = Component.translatable("equipmentcompare.general.badgeText");
-					}
+					MutableComponent equippedBadge = getEquippedBadge();
 					
 					// Fix equippedRect x coordinate.
 					int tooltipWidth = equippedRect.getWidth();
@@ -272,7 +277,7 @@ public class ComparisonTooltips
 					}
 					else
 					{
-						equippedRect = new Rect2i(previousRect.getX() - equippedRect.getWidth() - 4 - (equippedRect.getWidth() - tooltipWidth) / 2, equippedRect.getY(), equippedRect.getWidth(), equippedRect.getHeight());
+						equippedRect = new Rect2i(previousRect.getX() - equippedRect.getWidth() - 12 - (equippedRect.getWidth() - tooltipWidth) / 2, equippedRect.getY(), equippedRect.getWidth(), equippedRect.getHeight());
 					}
 
 					tooltipRects.put(thisItem, equippedRect);

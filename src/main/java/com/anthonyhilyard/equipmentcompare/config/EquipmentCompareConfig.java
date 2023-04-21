@@ -1,14 +1,15 @@
-package com.anthonyhilyard.equipmentcompare;
+package com.anthonyhilyard.equipmentcompare.config;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.anthonyhilyard.iceberg.util.Selectors;
 import com.electronwill.nightconfig.core.Config;
 
 import org.apache.commons.lang3.tuple.Pair;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
@@ -21,13 +22,14 @@ public class EquipmentCompareConfig
 
 	public final BooleanValue defaultOn;
 	public final BooleanValue strict;
+	public final LongValue maxComparisons;
 	public final LongValue badgeBackgroundColor;
 	public final LongValue badgeBorderStartColor;
 	public final LongValue badgeBorderEndColor;
 	public final BooleanValue overrideBadgeText;
 	public final ConfigValue<String> badgeText;
 	public final LongValue badgeTextColor;
-	public final ConfigValue<List<? extends String>> blacklist;
+	private final ConfigValue<List<? extends String>> blacklist;
 
 	static
 	{
@@ -41,6 +43,7 @@ public class EquipmentCompareConfig
 	{
 		build.comment("Client Configuration").push("client").push("visual_options");
 
+		maxComparisons = build.comment(" The maximum number of comparison tooltips to show onscreen at once.").defineInRange("max_comparisons", 3L, 1L, 10L);		
 		overrideBadgeText = build.comment(" If badge_text should override the built-in translatable text.").define("override_badge_text", false);
 		badgeText = build.comment(" The text shown on the badge above equipped tooltips.").define("badge_text", "Equipped");
 		badgeTextColor = build.comment(" The color of the text shown on the badge above equipped tooltips.").defineInRange("badge_text_color", 0xFFFFFFFFL, 0x00000000L, 0xFFFFFFFFL);
@@ -52,9 +55,21 @@ public class EquipmentCompareConfig
 
 		defaultOn = build.comment(" If the comparison tooltip should show by default (pressing bound key hides).").define("default_on", false);
 		strict = build.comment(" If tool comparisons should compare only the same types of tools (can't compare a sword to an axe, for example).").define("strict", false);
-		blacklist = build.comment(" Blacklist of items to show comparisons for.  Add item IDs to prevent them from being compared when hovered over or equipped.").defineListAllowEmpty(Arrays.asList("blacklist"), () -> new ArrayList<String>(), e -> ResourceLocation.isValidResourceLocation((String)e) );
+		blacklist = build.comment(" Item blacklist to disable comparisons for.  Add to prevent items from being compared when hovered over or equipped.  All Iceberg item selectors are supported (https://github.com/AHilyard/Iceberg/wiki/Item-Selectors-Documentation).").defineListAllowEmpty(Arrays.asList("blacklist"), () -> new ArrayList<String>(), e -> Selectors.validateSelector((String)e) );
 
 		build.pop().pop();
+	}
+
+	public static boolean isItemBlacklisted(ItemStack itemStack)
+	{
+		for (String entry : INSTANCE.blacklist.get())
+		{
+			if (Selectors.itemMatches(itemStack, entry))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 }
