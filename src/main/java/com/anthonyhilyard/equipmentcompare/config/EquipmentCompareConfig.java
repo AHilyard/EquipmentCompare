@@ -1,20 +1,20 @@
-package com.anthonyhilyard.equipmentcompare;
+package com.anthonyhilyard.equipmentcompare.config;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.anthonyhilyard.iceberg.util.Selectors;
 import com.electronwill.nightconfig.core.Config;
 
 import org.apache.commons.lang3.tuple.Pair;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 import net.minecraftforge.common.ForgeConfigSpec.LongValue;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.config.IConfigEvent;
 
 public class EquipmentCompareConfig
 {
@@ -23,6 +23,7 @@ public class EquipmentCompareConfig
 
 	public final BooleanValue defaultOn;
 	public final BooleanValue strict;
+	public final LongValue maxComparisons;
 	public final LongValue badgeBackgroundColor;
 	public final LongValue badgeBorderStartColor;
 	public final LongValue badgeBorderEndColor;
@@ -43,6 +44,7 @@ public class EquipmentCompareConfig
 	{
 		build.comment("Client Configuration").push("client").push("visual_options");
 
+		maxComparisons = build.comment(" The maximum number of comparison tooltips to show onscreen at once.").defineInRange("max_comparisons", 3L, 1L, 10L);		
 		overrideBadgeText = build.comment(" If badge_text should override the built-in translatable text.").define("override_badge_text", false);
 		badgeText = build.comment(" The text shown on the badge above equipped tooltips.").define("badge_text", "Equipped");
 		badgeTextColor = build.comment(" The color of the text shown on the badge above equipped tooltips.").defineInRange("badge_text_color", 0xFFFFFFFFL, 0x00000000L, 0xFFFFFFFFL);
@@ -59,9 +61,16 @@ public class EquipmentCompareConfig
 		build.pop().pop();
 	}
 
-	@SubscribeEvent
-	public static void onLoad(IConfigEvent e)
+	public static boolean isItemBlacklisted(ItemStack itemStack)
 	{
+		for (String entry : INSTANCE.blacklist.get())
+		{
+			if (Selectors.itemMatches(itemStack, entry))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

@@ -51,21 +51,21 @@ dependencies {
 	minecraft "net.minecraftforge:forge:${project.mcVersion}-${project.forgeVersion}"
 	annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
-	implementation fg.deobf("curse.maven:iceberg-520110:4248148")
-	compileClasspath fg.deobf('curse.maven:legendarytooltips-532127:4238818')
-	compileClasspath fg.deobf('curse.maven:curios-309927:3825806')
+	implementation fg.deobf("curse.maven:iceberg-520110:4484740")
+	compileClasspath fg.deobf('curse.maven:legendarytooltips-532127:4484744')
+	compileClasspath fg.deobf('curse.maven:curios-309927:4478589')
 	compileClasspath fg.deobf('curse.maven:baubles-366844:3545502')
 }
 
 jar {
 	manifest {
-		attributes(["Specification-Title": project.name,
-					"Specification-Vendor": project.author,
-					"Specification-Version": project.version,
-					"Implementation-Title": project.name,
-					"Implementation-Version": project.version,
-					"Implementation-Vendor" : project.author,
-					"Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-					"MixinConfigs": "${project.name.toLowerCase()}.mixins.json"],)
+		attributes(["Specification-Title":		project.name,
+					"Specification-Vendor":		project.author,
+					"Specification-Version":	project.version,
+					"Implementation-Title":		project.name,
+					"Implementation-Version":	project.version,
+					"Implementation-Vendor" :	project.author,
+					"Implementation-Timestamp":	new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+					"MixinConfigs":				"${project.name.toLowerCase()}.mixins.json"],)
 	}
 }

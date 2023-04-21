@@ -1,6 +1,6 @@
 # Changelog
 
-### 1.3.1
+### 1.3.2
 - Added support for Minecraft 1.19.3.
 - Fixed a bug that caused the keybind to be missing from the controls screen.
 - Fixed a bug that caused the comparison tooltips key to stick under certain circumstances.
