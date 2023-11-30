@@ -4,8 +4,8 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import com.anthonyhilyard.equipmentcompare.gui.ComparisonTooltips;
-import com.mojang.blaze3d.vertex.PoseStack;
 
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -14,45 +14,45 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
+import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 import net.minecraft.world.item.ItemStack;
 
-@Mixin(Screen.class)
-public abstract class ScreenMixin extends AbstractContainerEventHandler
+@Mixin(GuiGraphics.class)
+public abstract class GuiGraphicsMixin
 {
 	@Nullable
 	@Shadow
-	protected Minecraft minecraft;
-
-	@Shadow
-	protected Font font;
+	@Final
+	private Minecraft minecraft;
 
 	@Shadow(remap = false)
-	private ItemStack tooltipStack;
+	private ItemStack tooltipStack = ItemStack.EMPTY;
 
 	private boolean tooltipsDisplayed;
 
-	@Inject(method = "renderTooltip(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/item/ItemStack;II)V", at = @At(value  = "HEAD"), cancellable = true)
-	public void renderTooltip(PoseStack poseStack, ItemStack itemStack, int x, int y, CallbackInfo info)
+	@Inject(method = "renderTooltip(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;II)V", at = @At(value  = "HEAD"), cancellable = true)
+	public void renderTooltip(Font font, ItemStack itemStack, int x, int y, CallbackInfo info)
 	{
-		Screen self = (Screen)(Object)this;
+		GuiGraphics self = (GuiGraphics)(Object)this;
+		Screen currentScreen = minecraft.screen;
 		tooltipsDisplayed = false;
 
 		// If the comparison tooltips were displayed, cancel so the default functionality is not run.
-		if (ComparisonTooltips.render(poseStack, x, y, itemStack, minecraft, font, self))
+		if (ComparisonTooltips.render(self, DefaultTooltipPositioner.INSTANCE, x, y, itemStack, minecraft, font, currentScreen))
 		{
 			info.cancel();
 			tooltipsDisplayed = true;
 		}
 		// Just in case, try it again with the hovered item.
-		else if (self instanceof AbstractContainerScreen)
+		else if (currentScreen instanceof AbstractContainerScreen<?> containerScreen)
 		{
-			AbstractContainerScreen<?> containerSelf = (AbstractContainerScreen<?>)self;
-			if (ComparisonTooltips.render(poseStack, x, y, containerSelf.hoveredSlot, minecraft, font, containerSelf))
+			ItemStack hoveredStack = (containerScreen.hoveredSlot != null && containerScreen.hoveredSlot.hasItem()) ? containerScreen.hoveredSlot.getItem() : ItemStack.EMPTY;
+			if (ComparisonTooltips.render(self, DefaultTooltipPositioner.INSTANCE, x, y, hoveredStack, minecraft, font, containerScreen))
 			{
 				info.cancel();
 				tooltipsDisplayed = true;
@@ -61,12 +61,15 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler
 	}
 
 	@Inject(method = "renderTooltipInternal", at = @At(value  = "HEAD"), cancellable = true)
-	public void renderTooltipInternal(PoseStack poseStack, List<ClientTooltipComponent> components, int x, int y, ClientTooltipPositioner positioner, CallbackInfo info)
+	public void renderTooltipInternal(Font font, List<ClientTooltipComponent> components, int x, int y, ClientTooltipPositioner positioner, CallbackInfo info)
 	{
+		GuiGraphics self = (GuiGraphics)(Object)this;
+		Screen currentScreen = minecraft.screen;
+
 		if (!tooltipsDisplayed && tooltipStack != ItemStack.EMPTY)
 		{
 			// If the comparison tooltips were displayed, cancel so the default functionality is not run.
-			if (ComparisonTooltips.render(poseStack, x, y, tooltipStack, minecraft, font, (Screen)(Object)this))
+			if (ComparisonTooltips.render(self, positioner, x, y, tooltipStack, minecraft, font, currentScreen))
 			{
 				info.cancel();
 			}
