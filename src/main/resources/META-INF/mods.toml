@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[46,)"
+loaderVersion="[48,)"
 license="CC BY-NC-ND 4.0"
 
 [[mods]]
@@ -15,28 +15,28 @@ description='''Adds additional tooltips when hovering over equipment for easy co
 [[dependencies.equipmentcompare]]
 	modId="forge"
 	mandatory=true
-	versionRange="[46,)"
+	versionRange="[48,)"
 	ordering="NONE"
 	side="BOTH"
 
 [[dependencies.equipmentcompare]]
 	modId="minecraft"
 	mandatory=true
-	versionRange="[1.20,)"
+	versionRange="[1.20.2,)"
 	ordering="NONE"
 	side="BOTH"
 
 [[dependencies.equipmentcompare]]
 	modId="iceberg"
 	mandatory=true
-	versionRange="[1.1.10,)"
+	versionRange="[1.1.16,)"
 	ordering="NONE"
 	side="BOTH"
 
 [[dependencies.equipmentcompare]]
 	modId="legendarytooltips"
 	mandatory=false
-	versionRange="[1.4.2,)"
+	versionRange="[1.4.5,)"
 	ordering="NONE"
 	side="BOTH"
 
