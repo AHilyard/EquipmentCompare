@@ -18,8 +18,10 @@ import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.Rect2i;
@@ -31,7 +33,6 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -58,7 +59,7 @@ public class ComparisonTooltips
 	}
 
 	@SuppressWarnings("null")
-	private static void drawTooltip(PoseStack poseStack, ItemStack itemStack, Rect2i rect, List<ClientTooltipComponent> tooltipLines, Font font, Screen screen, int maxWidth, boolean showBadge, boolean centeredTitle, int index)
+	private static void drawTooltip(GuiGraphics graphics, ClientTooltipPositioner positioner, ItemStack itemStack, Rect2i rect, List<ClientTooltipComponent> tooltipLines, Font font, Screen screen, int maxWidth, boolean showBadge, boolean centeredTitle, int index)
 	{
 		int bgColor = EquipmentCompareConfig.INSTANCE.badgeBackgroundColor.get().intValue();
 		int borderStartColor = EquipmentCompareConfig.INSTANCE.badgeBorderStartColor.get().intValue();
@@ -68,6 +69,7 @@ public class ComparisonTooltips
 		MutableComponent equippedBadge = getEquippedBadge().withStyle(textColor);
 
 		boolean constrainToRect = false;
+		PoseStack poseStack = graphics.pose();
 
 		if (showBadge)
 		{
@@ -91,7 +93,7 @@ public class ComparisonTooltips
 				bgColor = DEFAULT_BACKGROUND_COLOR;
 
 				// Fire a color event to properly update the background color if needed.
-				ColorExtResult colorResult = RenderTooltipEvents.COLOREXT.invoker().onColor(itemStack, tooltipLines, poseStack, rect.getX(), rect.getY(), font, bgColor, bgColor, borderStartColor, borderEndColor, showBadge, index);
+				ColorExtResult colorResult = RenderTooltipEvents.COLOREXT.invoker().onColor(itemStack, graphics, rect.getX(), rect.getY(), font, bgColor, bgColor, borderStartColor, borderEndColor, tooltipLines, showBadge, index);
 				if (colorResult != null)
 				{
 					bgColor = colorResult.backgroundStart();
@@ -123,17 +125,11 @@ public class ComparisonTooltips
 			poseStack.popPose();
 		}
 
-		Tooltips.renderItemTooltip(itemStack, poseStack, new Tooltips.TooltipInfo(tooltipLines, font, Tooltips.calculateTitleLines(tooltipLines)), rect, screen.width, screen.height, DEFAULT_BACKGROUND_COLOR, DEFAULT_BACKGROUND_COLOR, DEFAULT_BORDER_COLOR_START, DEFAULT_BORDER_COLOR_END, showBadge, constrainToRect, centeredTitle, index);
+		Tooltips.renderItemTooltip(itemStack, new Tooltips.TooltipInfo(tooltipLines, font, Tooltips.calculateTitleLines(tooltipLines)), rect, screen.width, screen.height, DEFAULT_BACKGROUND_COLOR, DEFAULT_BACKGROUND_COLOR, DEFAULT_BORDER_COLOR_START, DEFAULT_BORDER_COLOR_END, graphics, positioner, showBadge, constrainToRect, centeredTitle, index);
 	}
 
-	public static boolean render(PoseStack poseStack, int x, int y, Slot hoveredSlot, Minecraft minecraft, Font font, Screen screen)
-	{
-		ItemStack itemStack = hoveredSlot != null ? hoveredSlot.getItem() : ItemStack.EMPTY;
-		return render(poseStack, x, y, itemStack, minecraft, font, screen);
-	}
-	
 	@SuppressWarnings({"unchecked", "null"})
-	public static boolean render(PoseStack poseStack, int x, int y, ItemStack itemStack, Minecraft minecraft, Font font, Screen screen)
+	public static boolean render(GuiGraphics graphics, ClientTooltipPositioner positioner, int x, int y, ItemStack itemStack, Minecraft minecraft, Font font, Screen screen)
 	{
 		// The screen must be valid to render tooltips.
 		if (screen == null || minecraft == null || minecraft.player == null || minecraft.player.containerMenu == null || itemStack == null)
@@ -234,8 +230,8 @@ public class ComparisonTooltips
 					}
 				}
 
-				List<ClientTooltipComponent> itemStackTooltipLines = Tooltips.gatherTooltipComponents(itemStack, screen.getTooltipFromItem(itemStack), itemStack.getTooltipImage(), x, screen.width, screen.height, itemFont, font, maxWidth, 0);
-				Rect2i itemStackRect = Tooltips.calculateRect(itemStack, poseStack, itemStackTooltipLines, x, y, screen.width, screen.height, maxWidth, itemFont, enforceMinimumWidth ? 48 : 0, centeredTitle);
+				List<ClientTooltipComponent> itemStackTooltipLines = Tooltips.gatherTooltipComponents(itemStack, Screen.getTooltipFromItem(minecraft, itemStack), itemStack.getTooltipImage(), x, screen.width, screen.height, itemFont, font, maxWidth, 0);
+				Rect2i itemStackRect = Tooltips.calculateRect(itemStack, graphics, positioner, itemStackTooltipLines, x, y, screen.width, screen.height, maxWidth, itemFont, enforceMinimumWidth ? 48 : 0, centeredTitle);
 				if (x + itemStackRect.getWidth() + 12 > screen.width)
 				{
 					itemStackRect = new Rect2i(screen.width - itemStackRect.getWidth() - 24, itemStackRect.getY(), itemStackRect.getWidth(), itemStackRect.getHeight());
@@ -262,8 +258,8 @@ public class ComparisonTooltips
 						itemFont = Screens.getTextRenderer(screen);
 					}
 
-					List<ClientTooltipComponent> equippedTooltipLines = Tooltips.gatherTooltipComponents(thisItem, screen.getTooltipFromItem(thisItem), thisItem.getTooltipImage(), x - previousRect.getWidth() - 14, screen.width, screen.height, itemFont, font, maxWidth, tooltipIndex++);
-					Rect2i equippedRect = Tooltips.calculateRect(itemStack, poseStack, equippedTooltipLines, x - previousRect.getWidth() - 14, y, screen.width, screen.height, maxWidth, itemFont, enforceMinimumWidth ? 48 : 0, centeredTitle);
+					List<ClientTooltipComponent> equippedTooltipLines = Tooltips.gatherTooltipComponents(thisItem, Screen.getTooltipFromItem(minecraft, thisItem), thisItem.getTooltipImage(), x - previousRect.getWidth() - 14, screen.width, screen.height, itemFont, font, maxWidth, tooltipIndex++);
+					Rect2i equippedRect = Tooltips.calculateRect(itemStack, graphics, positioner, equippedTooltipLines, x - previousRect.getWidth() - 14, y, screen.width, screen.height, maxWidth, itemFont, enforceMinimumWidth ? 48 : 0, centeredTitle);
 					MutableComponent equippedBadge = getEquippedBadge();
 					
 					// Fix equippedRect x coordinate.
@@ -306,9 +302,9 @@ public class ComparisonTooltips
 				// Now draw them all.
 				for (ItemStack thisItem : equippedItems)
 				{
-					drawTooltip(poseStack, thisItem, tooltipRects.get(thisItem), tooltipLines.get(thisItem), font, screen, maxWidth, true, centeredTitle, tooltipIndex++);
+					drawTooltip(graphics, positioner, thisItem, tooltipRects.get(thisItem), tooltipLines.get(thisItem), font, screen, maxWidth, true, centeredTitle, tooltipIndex++);
 				}
-				drawTooltip(poseStack, itemStack, itemStackRect, itemStackTooltipLines, font, screen, maxWidth, false, centeredTitle, 0);
+				drawTooltip(graphics, positioner, itemStack, itemStackRect, itemStackTooltipLines, font, screen, maxWidth, false, centeredTitle, 0);
 
 				return true;
 			}
