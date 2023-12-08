@@ -23,7 +23,7 @@ repositories {
 	}
 	maven {
 		name = "Ladysnake Libs"
-		url = "https://ladysnake.jfrog.io/artifactory/mods"
+		url = "https://maven.ladysnake.org/releases"
 	}
 }
 
@@ -38,11 +38,11 @@ dependencies {
 	modApi files("libs/LegendaryTooltips-1.20.1-fabric-1.4.3.jar")
 
 	// These are all needed for Trinkets.
-	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:${ccaVersion}")
-	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:${ccaVersion}")
-	modImplementation "curse.maven:trinkets-341284:4573009"
+	modApi include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:${ccaVersion}")
+	modApi include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:${ccaVersion}")
+	modImplementation "curse.maven:trinkets-341284:4762647"
 
-	modImplementation "curse.maven:roughlyenoughitems-310111:4622769"
+	modImplementation "curse.maven:roughlyenoughitems-310111:4878207"
 }
 
 loom {

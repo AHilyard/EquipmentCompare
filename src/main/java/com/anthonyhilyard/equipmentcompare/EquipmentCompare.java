@@ -15,6 +15,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
 
+@SuppressWarnings("deprecation")
 public class EquipmentCompare implements ClientModInitializer
 {
 	public static final Logger LOGGER = LogManager.getLogger(Loader.MODID);

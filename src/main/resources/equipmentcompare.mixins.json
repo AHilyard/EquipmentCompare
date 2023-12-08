@@ -6,7 +6,6 @@
 	"client": [
 		"AnvilScreenMixin",
 		"GuiGraphicsMixin",
-		"KeyMappingMixin",
 		"RoughlyEnoughItemsScreenOverlayImplFabricMixin",
 		"ScreenMixin"
 	],

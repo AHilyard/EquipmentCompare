@@ -15,6 +15,7 @@ import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 import net.minecraftforge.common.ForgeConfigSpec.LongValue;
 
+@SuppressWarnings("deprecation")
 public class EquipmentCompareConfig
 {
 	public static final ForgeConfigSpec SPEC;

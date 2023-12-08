@@ -44,6 +44,7 @@ public class ComparisonTooltips
 	private static final int DEFAULT_BORDER_COLOR_START = 0x505000FF;
 	private static final int DEFAULT_BORDER_COLOR_END = 0x5028007F;
 
+	@SuppressWarnings("deprecation")
 	private static MutableComponent getEquippedBadge()
 	{
 		MutableComponent equippedBadge;
@@ -58,7 +59,7 @@ public class ComparisonTooltips
 		return equippedBadge;
 	}
 
-	@SuppressWarnings("null")
+	@SuppressWarnings({"null", "deprecation"})
 	private static void drawTooltip(GuiGraphics graphics, ClientTooltipPositioner positioner, ItemStack itemStack, Rect2i rect, List<ClientTooltipComponent> tooltipLines, Font font, Screen screen, int maxWidth, boolean showBadge, boolean centeredTitle, int index)
 	{
 		int bgColor = EquipmentCompareConfig.INSTANCE.badgeBackgroundColor.get().intValue();
@@ -128,7 +129,7 @@ public class ComparisonTooltips
 		Tooltips.renderItemTooltip(itemStack, new Tooltips.TooltipInfo(tooltipLines, font, Tooltips.calculateTitleLines(tooltipLines)), rect, screen.width, screen.height, DEFAULT_BACKGROUND_COLOR, DEFAULT_BACKGROUND_COLOR, DEFAULT_BORDER_COLOR_START, DEFAULT_BORDER_COLOR_END, graphics, positioner, showBadge, constrainToRect, centeredTitle, index);
 	}
 
-	@SuppressWarnings({"unchecked", "null"})
+	@SuppressWarnings({"unchecked", "null", "deprecation"})
 	public static boolean render(GuiGraphics graphics, ClientTooltipPositioner positioner, int x, int y, ItemStack itemStack, Minecraft minecraft, Font font, Screen screen)
 	{
 		// The screen must be valid to render tooltips.
