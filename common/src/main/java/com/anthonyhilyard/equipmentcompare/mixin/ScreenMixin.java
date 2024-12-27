@@ -28,7 +28,7 @@ public class ScreenMixin extends AbstractContainerEventHandler
 		EquipmentCompare.comparisonsActive = false;
 	}
 
-	@Inject(method = "keyPressed(III)Z", at = @At(value = "HEAD"), cancellable = true)
+	@Inject(method = "keyPressed(III)Z", at = @At(value = "RETURN"), cancellable = true)
 	public void keyPressed(int i, int j, int k, CallbackInfoReturnable<Boolean> info)
 	{
 		if (EquipmentCompare.showComparisonTooltip.matches(i, j))
