@@ -2,6 +2,7 @@ package com.anthonyhilyard.equipmentcompare.mixin;
 
 import com.anthonyhilyard.equipmentcompare.EquipmentCompare;
 
+import net.minecraft.client.input.KeyEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -12,22 +13,22 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AnvilScreen;
 import net.minecraft.client.gui.screens.inventory.ItemCombinerScreen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AnvilMenu;
 
 @Mixin(AnvilScreen.class)
 public class AnvilScreenMixin extends ItemCombinerScreen<AnvilMenu>
 {
-	public AnvilScreenMixin(AnvilMenu itemCombinerMenu, Inventory inventory, Component component, ResourceLocation resourceLocation)
+	public AnvilScreenMixin(AnvilMenu itemCombinerMenu, Inventory inventory, Component component, Identifier resourceLocation)
 	{
 		super(itemCombinerMenu, inventory, component, resourceLocation);
 	}
 
 	@Inject(method = "keyPressed", at = @At(value = "HEAD"), cancellable = true)
-	public void keyPressed(int i, int j, int k, CallbackInfoReturnable<Boolean> info)
+	public void keyPressed(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> info)
 	{
-		if (EquipmentCompare.showComparisonTooltip.matches(i, j))
+		if (EquipmentCompare.showComparisonTooltip.matches(keyEvent))
 		{
 			EquipmentCompare.comparisonsActive = true;
 			info.setReturnValue(true);
@@ -35,14 +36,14 @@ public class AnvilScreenMixin extends ItemCombinerScreen<AnvilMenu>
 	}
 
 	@Override
-	public boolean keyReleased(int i, int j, int k)
+	public boolean keyReleased(KeyEvent keyEvent)
 	{
-		if (EquipmentCompare.showComparisonTooltip.matches(i, j))
+		if (EquipmentCompare.showComparisonTooltip.matches(keyEvent))
 		{
 			EquipmentCompare.comparisonsActive = false;
 			return true;
 		}
-		return super.keyReleased(i, j, k);
+		return super.keyReleased(keyEvent);
 	}
 
 	@Shadow

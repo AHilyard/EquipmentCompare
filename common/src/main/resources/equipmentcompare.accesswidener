@@ -1,5 +1,5 @@
 accessWidener	v1	named
 accessible		field		net/minecraft/client/KeyMapping											key					Lcom/mojang/blaze3d/platform/InputConstants$Key;
 accessible		field		net/minecraft/client/gui/screens/inventory/AbstractContainerScreen		hoveredSlot			Lnet/minecraft/world/inventory/Slot;
-accessible		method		net/minecraft/client/gui/screens/inventory/tooltip/TooltipRenderUtil	getBackgroundSprite	(Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/resources/ResourceLocation;
-accessible		method		net/minecraft/client/gui/screens/inventory/tooltip/TooltipRenderUtil	getFrameSprite		(Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/resources/ResourceLocation;
+accessible		method		net/minecraft/client/gui/screens/inventory/tooltip/TooltipRenderUtil	getBackgroundSprite	(Lnet/minecraft/resources/Identifier;)Lnet/minecraft/resources/Identifier;
+accessible		method		net/minecraft/client/gui/screens/inventory/tooltip/TooltipRenderUtil	getFrameSprite		(Lnet/minecraft/resources/Identifier;)Lnet/minecraft/resources/Identifier;

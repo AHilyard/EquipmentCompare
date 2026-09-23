@@ -23,7 +23,7 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.gui.screens.inventory.tooltip.TooltipRenderUtil;
 import net.minecraft.client.renderer.Rect2i;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
@@ -34,7 +34,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.joml.Matrix4f;
+import org.joml.Matrix3x2fStack;
 
 public class ComparisonTooltips
 {
@@ -66,7 +66,7 @@ public class ComparisonTooltips
 		MutableComponent equippedBadge = getEquippedBadge().withStyle(textColor);
 
 		boolean constrainToRect = false;
-		PoseStack poseStack = graphics.pose();
+		Matrix3x2fStack matrix = graphics.pose();
 
 		if (showBadge)
 		{
@@ -75,10 +75,8 @@ public class ComparisonTooltips
 				rect = new Rect2i(rect.getX(), screen.height - rect.getHeight() - 4, rect.getWidth(), rect.getHeight());
 			}
 
-			poseStack.pushPose();
-			poseStack.translate(rect.getX(), rect.getY(), 400);
-
-			Matrix4f matrix = poseStack.last().pose();
+			matrix.pushMatrix();
+			matrix.translate(rect.getX(), rect.getY());
 
 			int badgeOffset = 0;
 
@@ -109,53 +107,53 @@ public class ComparisonTooltips
 				if (!gradientBackground)
 				{
 					// Render the background resource.
-					graphics.blitSprite(RenderType::guiTextured, TooltipRenderUtil.getBackgroundSprite(itemStack.get(DataComponents.TOOLTIP_STYLE)), rect.getX() - 12, rect.getY() - 12 - 17 + badgeOffset, rect.getWidth() + 24 + 8, rect.getHeight() + 24 + 17 + 8);
+					graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TooltipRenderUtil.getBackgroundSprite(itemStack.get(DataComponents.TOOLTIP_STYLE)), rect.getX() - 12, rect.getY() - 12 - 17 + badgeOffset, rect.getWidth() + 24 + 8, rect.getHeight() + 24 + 17 + 8);
 				}
 				else
 				{
-					poseStack.pushPose();
-					poseStack.translate(0.0f, 0.0f, -400);
-					Tooltips.renderGradientBackground(graphics, 4, -14 + badgeOffset, rect.getWidth(), rect.getHeight() + 12, 400, bgColor, bgColorEnd);
-					poseStack.popPose();
+					matrix.pushMatrix();
+					matrix.translate(0.0f, 0.0f);
+					Tooltips.renderGradientBackground(graphics, 4, -14 + badgeOffset, rect.getWidth(), rect.getHeight() + 12, bgColor, bgColorEnd);
+					matrix.popMatrix();
 				}
 
 				if (!gradientBorder)
 				{
 					// Render the border resource.
-					graphics.blitSprite(RenderType::guiTextured, TooltipRenderUtil.getFrameSprite(itemStack.get(DataComponents.TOOLTIP_STYLE)), rect.getX() - 12, rect.getY() - 12 - 17 + badgeOffset, rect.getWidth() + 24 + 8, rect.getHeight() + 24 + 17 + 8);
+					graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TooltipRenderUtil.getFrameSprite(itemStack.get(DataComponents.TOOLTIP_STYLE)), rect.getX() - 12, rect.getY() - 12 - 17 + badgeOffset, rect.getWidth() + 24 + 8, rect.getHeight() + 24 + 17 + 8);
 				}
 				else
 				{
-					poseStack.pushPose();
-					poseStack.translate(0.0f, 0.0f, -400);
-					Tooltips.renderGradientBorder(graphics, 4, -14 + badgeOffset, rect.getWidth(), rect.getHeight() + 12, 400, borderStartColor, borderEndColor);
-					poseStack.popPose();
+					matrix.pushMatrix();
+					matrix.translate(0.0f, 0.0f);
+					Tooltips.renderGradientBorder(graphics, 4, -14 + badgeOffset, rect.getWidth(), rect.getHeight() + 12, borderStartColor, borderEndColor);
+					matrix.popMatrix();
 				}
 
-				poseStack.popPose();
+				matrix.popMatrix();
 				Tooltips.renderItemTooltip(itemStack, new Tooltips.TooltipInfo(tooltipLines, font, Tooltips.calculateTitleLines(tooltipLines)), rect, screen.width, screen.height, DEFAULT_BACKGROUND_COLOR, DEFAULT_BACKGROUND_COLOR, DEFAULT_BORDER_COLOR_START, DEFAULT_BORDER_COLOR_END, graphics, positioner, true, constrainToRect, centeredTitle, index, null, true, true);
 			}
 			else
 			{
-				GuiHelper.drawGradientRect(matrix, -1, 1,					-17 + badgeOffset, rect.getWidth() + 7, -16 + badgeOffset, bgColor, bgColor);
-				GuiHelper.drawGradientRect(matrix, -1, 0,					-16 + badgeOffset, 1,					 -4 + badgeOffset, bgColor, bgColor);
-				GuiHelper.drawGradientRect(matrix, -1, rect.getWidth() + 7,	-16 + badgeOffset, rect.getWidth() + 8,  -4 + badgeOffset, bgColor, bgColor);
-				GuiHelper.drawGradientRect(matrix, -1, 1,					 -4 + badgeOffset,  rect.getWidth() + 7, -3 + badgeOffset, bgColor, bgColor);
-				GuiHelper.drawGradientRect(matrix, -1, 1,					-16 + badgeOffset, rect.getWidth() + 7,  -4 + badgeOffset, bgColor, bgColor);
-				GuiHelper.drawGradientRect(matrix, -1, 1,					-15 + badgeOffset, 2,					 -5 + badgeOffset, borderStartColor, borderEndColor);
-				GuiHelper.drawGradientRect(matrix, -1, rect.getWidth() + 6,	-15 + badgeOffset, rect.getWidth() + 7,  -5 + badgeOffset, borderStartColor, borderEndColor);
-				GuiHelper.drawGradientRect(matrix, -1, 1,					-16 + badgeOffset, rect.getWidth() + 7, -15 + badgeOffset, borderStartColor, borderStartColor);
-				GuiHelper.drawGradientRect(matrix, -1, 1,					 -5 + badgeOffset,  rect.getWidth() + 7, -4 + badgeOffset, borderEndColor,   borderEndColor);
-				
-				poseStack.popPose();
+				GuiHelper.drawGradientRect(graphics, 1,					-17 + badgeOffset, rect.getWidth() + 7, -16 + badgeOffset, bgColor, bgColor);
+				GuiHelper.drawGradientRect(graphics, 0,					-16 + badgeOffset, 1,					 -4 + badgeOffset, bgColor, bgColor);
+				GuiHelper.drawGradientRect(graphics, rect.getWidth() + 7,	-16 + badgeOffset, rect.getWidth() + 8,  -4 + badgeOffset, bgColor, bgColor);
+				GuiHelper.drawGradientRect(graphics, 1,					 -4 + badgeOffset,  rect.getWidth() + 7, -3 + badgeOffset, bgColor, bgColor);
+				GuiHelper.drawGradientRect(graphics, 1,					-16 + badgeOffset, rect.getWidth() + 7,  -4 + badgeOffset, bgColor, bgColor);
+				GuiHelper.drawGradientRect(graphics, 1,					-15 + badgeOffset, 2,					 -5 + badgeOffset, borderStartColor, borderEndColor);
+				GuiHelper.drawGradientRect(graphics, rect.getWidth() + 6,	-15 + badgeOffset, rect.getWidth() + 7,  -5 + badgeOffset, borderStartColor, borderEndColor);
+				GuiHelper.drawGradientRect(graphics, 1,					-16 + badgeOffset, rect.getWidth() + 7, -15 + badgeOffset, borderStartColor, borderStartColor);
+				GuiHelper.drawGradientRect(graphics, 1,					 -5 + badgeOffset,  rect.getWidth() + 7, -4 + badgeOffset, borderEndColor,   borderEndColor);
+
+				matrix.popMatrix();
 				Tooltips.renderItemTooltip(itemStack, new Tooltips.TooltipInfo(tooltipLines, font, Tooltips.calculateTitleLines(tooltipLines)), rect, screen.width, screen.height, DEFAULT_BACKGROUND_COLOR, DEFAULT_BACKGROUND_COLOR, DEFAULT_BORDER_COLOR_START, DEFAULT_BORDER_COLOR_END, graphics, positioner, true, constrainToRect, centeredTitle, index);
 			}
 
-			poseStack.pushPose();
-			poseStack.translate(rect.getX(), rect.getY(), 401);
+			matrix.pushMatrix();
+			matrix.translate(rect.getX(), rect.getY());
 			graphics.drawCenteredString(font, equippedBadge, rect.getWidth() / 2 + 4, badgeOffset - 14, -1);
 
-			poseStack.popPose();
+			matrix.popMatrix();
 		}
 		else
 		{

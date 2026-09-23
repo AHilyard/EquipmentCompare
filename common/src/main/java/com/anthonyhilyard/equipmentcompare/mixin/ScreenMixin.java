@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.anthonyhilyard.equipmentcompare.EquipmentCompare;
 
+import net.minecraft.client.input.KeyEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -28,10 +29,10 @@ public class ScreenMixin extends AbstractContainerEventHandler
 		EquipmentCompare.comparisonsActive = false;
 	}
 
-	@Inject(method = "keyPressed(III)Z", at = @At(value = "HEAD"), cancellable = true)
-	public void keyPressed(int i, int j, int k, CallbackInfoReturnable<Boolean> info)
+	@Inject(method = "keyPressed", at = @At(value = "HEAD"), cancellable = true)
+	public void keyPressed(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> info)
 	{
-		if (EquipmentCompare.showComparisonTooltip.matches(i, j))
+		if (EquipmentCompare.showComparisonTooltip.matches(keyEvent))
 		{
 			EquipmentCompare.comparisonsActive = true;
 			info.setReturnValue(true);
@@ -40,13 +41,13 @@ public class ScreenMixin extends AbstractContainerEventHandler
 	}
 
 	@Override
-	public boolean keyReleased(int i, int j, int k)
+	public boolean keyReleased(KeyEvent keyEvent)
 	{
-		if (EquipmentCompare.showComparisonTooltip.matches(i, j))
+		if (EquipmentCompare.showComparisonTooltip.matches(keyEvent))
 		{
 			EquipmentCompare.comparisonsActive = false;
 			return true;
 		}
-		return super.keyReleased(i, j, k);
+		return super.keyReleased(keyEvent);
 	}
 }

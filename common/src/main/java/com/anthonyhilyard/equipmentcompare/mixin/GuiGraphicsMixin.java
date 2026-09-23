@@ -7,7 +7,9 @@ import java.util.List;
 import com.anthonyhilyard.equipmentcompare.EquipmentCompare;
 import com.anthonyhilyard.iceberg.services.Services;
 
+import net.minecraft.resources.Identifier;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -22,7 +24,6 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
 @Mixin(GuiGraphics.class)
@@ -109,13 +110,14 @@ public class GuiGraphicsMixin
 
 	private boolean tooltipsDisplayed;
 
-	@Inject(method = "renderTooltip(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;II)V", at = @At(value  = "HEAD"), cancellable = true)
-	public void renderTooltip(Font font, ItemStack itemStack, int x, int y, CallbackInfo info)
+	@Inject(method = "renderTooltip", at = @At(value  = "HEAD"), cancellable = true)
+	public void renderTooltip(Font font, List<ClientTooltipComponent> list, int x, int y, ClientTooltipPositioner clientTooltipPositioner, @Nullable Identifier resource, CallbackInfo info)
 	{
 		GuiGraphics self = (GuiGraphics)(Object)this;
 		Minecraft minecraft = Minecraft.getInstance();
 		Screen currentScreen = minecraft.screen;
 		tooltipsDisplayed = false;
+		ItemStack itemStack = getTooltipStack();
 
 		// If the comparison tooltips were displayed, cancel so the default functionality is not run.
 		if (renderComparisonTooltips(self, DefaultTooltipPositioner.INSTANCE, x, y, itemStack, minecraft, font, currentScreen))
@@ -135,8 +137,8 @@ public class GuiGraphicsMixin
 		}
 	}
 
-	@Inject(method = "renderTooltipInternal", at = @At(value  = "HEAD"), cancellable = true)
-	public void renderTooltipInternal(Font font, List<ClientTooltipComponent> components, int x, int y, ClientTooltipPositioner positioner, ResourceLocation resource, CallbackInfo info)
+	@Inject(method = "setTooltipForNextFrameInternal", at = @At(value  = "HEAD"), cancellable = true)
+	public void renderTooltipInternal(Font font, List<ClientTooltipComponent> list, int x, int y, ClientTooltipPositioner positioner, @Nullable Identifier resource, boolean bl, CallbackInfo info)
 	{
 		GuiGraphics self = (GuiGraphics)(Object)this;
 		Minecraft minecraft = Minecraft.getInstance();

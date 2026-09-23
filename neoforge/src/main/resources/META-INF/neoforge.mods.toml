@@ -9,34 +9,34 @@ displayName="Equipment Compare"
 displayURL="https://anthonyhilyard.com/"
 updateJSONURL="https://mc-update-check.anthonyhilyard.com/502561"
 logoFile="icon.png"
-authors="Grend"
+authors="Grend, Mat0u5"
 description='''Adds additional tooltips when hovering over equipment for easy comparisons.'''
 
 [[dependencies.equipmentcompare]]
 	modId="neoforge"
 	type="required"
-	versionRange="[21,)"
+	versionRange="[21.11.42,)"
 	ordering="NONE"
 	side="BOTH"
 
 [[dependencies.equipmentcompare]]
 	modId="minecraft"
 	type="required"
-	versionRange="[1.21.3,)"
+	versionRange="[1.21.11]"
 	ordering="NONE"
 	side="BOTH"
 
 [[dependencies.equipmentcompare]]
 	modId="iceberg"
 	type="required"
-	versionRange="[1.2.10,)"
+	versionRange="[1.4.0.2,)"
 	ordering="AFTER"
 	side="BOTH"
 
 [[dependencies.equipmentcompare]]
 	modId="legendarytooltips"
 	type="optional"
-	versionRange="[1.5.0,)"
+	versionRange="[1.6.0,)"
 	ordering="NONE"
 	side="BOTH"
 

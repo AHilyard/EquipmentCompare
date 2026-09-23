@@ -17,7 +17,7 @@ public class EquipmentCompare
 
 	public static boolean comparisonsActive = false;
 	public static final KeyMapping showComparisonTooltip = Services.getKeyMappingRegistrar().registerMapping(new KeyMapping("equipmentcompare.key.showTooltips",
-																InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_LEFT_SHIFT, KeyMapping.CATEGORY_INVENTORY));
+																InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_LEFT_SHIFT, KeyMapping.Category.INVENTORY));
 
 	public static void init()
 	{
