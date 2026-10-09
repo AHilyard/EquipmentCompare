@@ -1,101 +1,44 @@
-buildscript {
-	repositories {
-		flatDir {
-			dirs '../architectury-loom/build/libs'
-			dirs '../architectury-plugin/build/libs'
-		}
-		mavenCentral()
-	}
-	dependencies {
-		classpath name: 'architectury-loom-1.7.9999'
-		classpath "org.ow2.asm:asm:9.6"
-		classpath "org.ow2.asm:asm-analysis:9.6"
-		classpath "org.ow2.asm:asm-commons:9.6"
-		classpath "org.ow2.asm:asm-tree:9.6"
-		classpath "org.ow2.asm:asm-util:9.6"
-		classpath "commons-io:commons-io:2.15.1"
-		classpath "com.google.code.gson:gson:2.10.1"
-		classpath "com.google.guava:guava:33.0.0-jre"
-		classpath "net.fabricmc:stitch:0.6.2"
-		classpath "net.fabricmc:tiny-remapper:0.10.3"
-		classpath "net.fabricmc:access-widener:2.1.0"
-		classpath "net.fabricmc:mapping-io:0.6.1"
-		classpath "net.fabricmc:lorenz-tiny:4.0.2"
-		classpath "dev.architectury:mercury:0.1.4.17"
-		classpath "net.fabricmc:fabric-loom-native:0.2.0"
-		classpath "org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.9.0"
-		classpath "net.minecraftforge:installertools:1.2.0"
-		classpath "org.cadixdev:lorenz:0.5.3"
-		classpath "de.oceanlabs.mcp:mcinjector:3.8.0"
-		classpath "com.opencsv:opencsv:5.4"
-		classpath "net.minecraftforge:DiffPatch:2.0.7"
-		classpath "com.electronwill.night-config:toml:3.6.6"
-		classpath "com.mojang:datafixerupper:6.0.8"
-		classpath "dev.architectury:at:1.0.1"
-
-		classpath name: 'architectury-plugin-3.4.9999'
-		classpath "dev.architectury:architectury-transformer:5.2.86"
-		classpath "gradle.plugin.org.jetbrains.gradle.plugin.idea-ext:gradle-idea-ext:0.10"
-	}
-}
-
 plugins {
-	id 'io.github.goooler.shadow' version '8.1.7' apply false
+	id 'net.fabricmc.fabric-loom' version "${loom_version}"
+	id 'maven-publish'
 }
 
-apply plugin: 'architectury-plugin'
+version = project.mod_version
+group = project.maven_group
 
-architectury {
-	minecraft = project.minecraftVersion
+base {
+	archivesName = project.archives_base_name
 }
 
-allprojects {
-	group = rootProject.group
-	version = rootProject.modVersion
+repositories {
+	maven { name = 'Modrinth'; url = 'https://api.modrinth.com/maven' }
+	mavenCentral()
 }
 
-subprojects {
-	apply plugin: 'dev.architectury.loom'
-	apply plugin: 'architectury-plugin'
+// Client-only mod, no environment split — simpler on Loom 26.1+
+dependencies {
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
-	base {
-		archivesName = "$rootProject.name-$rootProject.minecraftVersion-$project.name"
+	// Iceberg required at runtime (install in mods/). Compile-only here so it is NOT bundled.
+	compileOnly files("libs/Iceberg-26.3-fabric-1.4.3.1.jar")
+}
+
+processResources {
+	def version = project.version
+	inputs.property "version", version
+	filesMatching("fabric.mod.json") {
+		expand "version": version
 	}
+}
 
-	repositories {
-		maven {
-			name = "CurseMaven"
-			url = "https://www.cursemaven.com"
-		}
-		maven {
-			name = "LadySnake"
-			url = 'https://maven.ladysnake.org/releases'
-		}
-	}
+tasks.withType(JavaCompile).configureEach {
+	it.options.release = 25
+}
 
-	dependencies {
-		minecraft "net.minecraft:minecraft:$rootProject.minecraftVersion"
-		mappings loom.officialMojangMappings()
-
-		modImplementation files("../libs/Iceberg-1.21-common-1.2.3.jar")
-		modImplementation files("../libs/LegendaryTooltips-1.21-common-1.4.7.jar")
-		modImplementation "curse.maven:adorned-1036809:5515068"
-		modImplementation "curse.maven:accessories-938917:5576244"
-		modImplementation "curse.maven:accessoriestrinkets-1005680:5575593"
-		modImplementation("org.ladysnake.cardinal-components-api:cardinal-components-base:6.1.0")
-		modImplementation("org.ladysnake.cardinal-components-api:cardinal-components-entity:6.1.0")
-	}
-
-	java {
-		sourceCompatibility = JavaVersion.VERSION_21
-		targetCompatibility = JavaVersion.VERSION_21
-	}
-
-	tasks.withType(JavaCompile).configureEach {
-		it.options.release = 21
-	}
-
-	remapJar {
-		destinationDirectory = file("$buildDir/../../output")
-	}
+java {
+	withSourcesJar()
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
 }

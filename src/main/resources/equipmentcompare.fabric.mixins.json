@@ -1,0 +1,10 @@
+{
+	"required": true,
+	"package": "com.anthonyhilyard.equipmentcompare.fabric.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"client": [],
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"minVersion": "0.8.5"
+}

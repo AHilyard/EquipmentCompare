@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "equipmentcompare",
+  "version": "${version}",
+  "name": "Equipment Compare",
+  "description": "Adds additional tooltips when hovering over equipment for easy comparisons. Port to 26.3.",
+  "authors": ["Grend"],
+  "contact": {
+    "homepage": "https://anthonyhilyard.com/",
+    "sources": "https://github.com/AHilyard/EquipmentCompare"
+  },
+  "license": "CC BY-NC-ND 4.0",
+  "icon": "icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.anthonyhilyard.equipmentcompare.fabric.client.EquipmentCompareFabricClient"
+    ]
+  },
+  "accessWidener": "equipmentcompare.accesswidener",
+  "mixins": [
+    "equipmentcompare.mixins.json",
+    "equipmentcompare.fabric.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.19.0",
+    "minecraft": "~26.3",
+    "java": ">=25",
+    "fabric-api": "*",
+    "iceberg": ">=1.4.3"
+  },
+  "suggests": {
+    "legendarytooltips": "*"
+  }
+}
